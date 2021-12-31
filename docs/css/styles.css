@@ -16,7 +16,7 @@
   --bs-purple: #6f42c1;
   --bs-pink: #d63384;
   --bs-red: #dc3545;
-  --bs-orange: #1E90FF;
+  --bs-orange: #bd5d38;
   --bs-yellow: #ffc107;
   --bs-green: #198754;
   --bs-teal: #20c997;
@@ -3476,7 +3476,7 @@ textarea.form-control-lg {
   text-decoration: underline;
 }
 .btn-link:hover {
-  color: #974a2d;
+  color: #1E90FF;
 }
 .btn-link:disabled, .btn-link.disabled {
   color: #6c757d;
@@ -3954,7 +3954,7 @@ textarea.form-control-lg {
   }
 }
 .nav-link:hover, .nav-link:focus {
-  color: #974a2d;
+  color: #1E90FF;
 }
 .nav-link.disabled {
   color: #6c757d;
