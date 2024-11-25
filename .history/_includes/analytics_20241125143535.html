@@ -1,0 +1,16 @@
+{% if page.analytics != false %}
+<!-- Google tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XELD79WFZH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XELD79WFZH');
+</script>
+
+<!-- Busuanzi Counting Script -->
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv">
+  <p style="color:#FFFFFF"># of Visits: <span id="busuanzi_value_site_pv"></span></p>
+</span>
+{% endif %}
