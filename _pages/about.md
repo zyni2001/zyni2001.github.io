@@ -22,7 +22,7 @@ Hi! I am an upcoming CS PhD student at **University of California, Berkeley**, s
 
 I am currently a PhD student at Computer Engineering, **University of Southern California**. Before my PhD study in the USA, I got my Bachelor's degree at **University of Science and Technology of China** in 2022.
 
-My research interests focus on Trustworthy AI, specifically in security and privacy, with an emphasis on LLMs and GNNs. I am also interested in generative AI for EDA and neuro-symbolic AI! Feel free to reach out to me if you are interested in these topics and we can collaborate! My wechat ID is `zyni-2001`.
+My research interests focus on Trustworthy AI, specifically in security and privacy, with an emphasis on LLMs and GNNs. I am also interested in generative AI for EDA and neuro-symbolic AI! Feel free to reach out to me if you are interested in these topics and we can collaborate!
 
 
 # News
