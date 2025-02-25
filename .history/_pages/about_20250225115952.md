@@ -22,7 +22,7 @@ Hi! I am a CS PhD student at **University of California, Berkeley**, supervised 
 
 I was PhD student at Computer Engineering, **University of Southern California** from 2022 to 2024. Before my PhD study, I got my Bachelor's degree at **University of Science and Technology of China** in 2022.
 
-My research interests focus on Trustworthy AI, specifically in security and privacy, with an emphasis on LLMs and GNNs. I am also interested in generative AI for EDA and neuro-symbolic AI! Feel free to reach out to me if you are interested in these topics and we can collaborate!
+My research interests focus on Trustworthy AI, specifically in security and privacy, with an emphasis on LLMs and GNNs. I am also interested in AI for EDA and neuro-symbolic AI! Feel free to reach out to me if you are interested in these topics and we can collaborate!
 
 
 # News
@@ -96,14 +96,31 @@ My research interests focus on Trustworthy AI, specifically in security and priv
  </tbody>
 </table> -->
 
-<table style="MARGIN-BOTTOM: 10px; FONT-SIZE: 13px; BORDER-COLLAPSE: collapse; TEXT-ALIGN: left; WIDTH: 98%; BACKGROUND-COLOR: #f6fbfe">
+<!-- <table style="MARGIN-BOTTOM: 10px; FONT-SIZE: 13px; BORDER-COLLAPSE: collapse; TEXT-ALIGN: left; WIDTH: 98%; BACKGROUND-COLOR: #f6fbfe">
   <tbody>
   <tr>
     <td style="FONT-SIZE: 10px; TEXT-ALIGN: center; WIDTH: 60px; BACKGROUND-COLOR: #e2eff9">
       <a href="https://openreview.net/forum?id=PX06pUVs1P" target="_blank">Link</a>
     </td>
     <td>
-      <span class="title" style="FONT-WEIGHT: bold">Finding Adversarially Robust Graph Lottery Tickets</span>
+      <span class="title" style="FONT-WEIGHT: bold">Unveiling Adversarially Robust Graph Lottery Tickets</span>
+      <br><b>Zhiyu Ni*</b>, Subhajit Dutta Chowdhury*, Qingyuan Peng, Souvik Kundu, Pierluigi Nuzzo
+      <br>TMLR 2024
+    </td> 
+  </tr>
+ </tbody>
+</table> -->
+
+<table style="MARGIN-BOTTOM: 10px; FONT-SIZE: 13px; BORDER-COLLAPSE: collapse; TEXT-ALIGN: left; WIDTH: 98%; BACKGROUND-COLOR: #f6fbfe">
+  <tbody>
+  <tr>
+    <td style="FONT-SIZE: 10px; TEXT-ALIGN: center; WIDTH: 60px; BACKGROUND-COLOR: #e2eff9">
+      <a href="https://openreview.net/forum?id=PX06pUVs1P" target="_blank">Paper</a>
+      <br>
+      <a href="https://github.com/zyni2001/ARGS" target="_blank">GitHub</a>
+    </td>
+    <td>
+      <span class="title" style="FONT-WEIGHT: bold">Unveiling Adversarially Robust Graph Lottery Tickets</span>
       <br><b>Zhiyu Ni*</b>, Subhajit Dutta Chowdhury*, Qingyuan Peng, Souvik Kundu, Pierluigi Nuzzo
       <br>TMLR 2024
     </td> 
@@ -115,7 +132,7 @@ My research interests focus on Trustworthy AI, specifically in security and priv
   <tbody>
   <tr>
     <td style="FONT-SIZE: 10px; TEXT-ALIGN: center; WIDTH: 60px; BACKGROUND-COLOR: #e2eff9">
-      <a href="https://cmsworkshops.com/ICASSP2024/view_session.php?SessionID=1129" target="_blank">Link</a>
+      <a href="https://cmsworkshops.com/ICASSP2024/view_session.php?SessionID=1129" target="_blank">Paper</a>
     </td>
     <td>
       <span class="title" style="FONT-WEIGHT: bold">Analyzing Adversarial Vulnerabilities of Graph Lottery Tickets</span>
