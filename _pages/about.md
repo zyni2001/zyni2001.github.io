@@ -25,9 +25,11 @@ I spent two and half years at **University of Southern California** from 2022 to
 My research interests focus on Trustworthy AI, specifically in security and privacy, with an emphasis on LLMs and GNNs. I am also interested in AI for EDA and neuro-symbolic AI! Feel free to reach out to me if you are interested in these topics and we can collaborate!
 
 # News
-
 <div style="margin-bottom: 20px;">
-  <p><strong>March 2025</strong> - I'm excited to announce that I will be starting my internship at <a href="https://www.synopsys.com/" target="_blank">Synopsys</a> this summer!</p>
+  <p><strong>April 2025</strong> - I'm happy to share that I have been selected as a <a href="https://www.dac.com/Attend/Students-Scholarships/Young-Student-Fellow-Program" target="_blank">Young Student Fellow</a> at DAC 2025!</p>
+</div>
+<div style="margin-bottom: 20px;">
+  <p><strong>March 2025</strong> - I'm excited to announce that I will start my first internship at <a href="https://www.synopsys.com/" target="_blank">Synopsys</a> this summer!</p>
 </div>
 <div style="margin-bottom: 20px;">
   <p><strong>December 2024</strong> - I am thrilled that I will continue my PhD journey at UC Berkeley EECS under the guidance of Professor Nuzzo!</p>
