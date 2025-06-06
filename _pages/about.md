@@ -118,6 +118,21 @@ My research interests focus on Trustworthy AI, specifically in security and priv
   <tbody>
   <tr>
     <td style="FONT-SIZE: 10px; TEXT-ALIGN: center; WIDTH: 60px; BACKGROUND-COLOR: #e2eff9">
+      <a href="https://openreview.net/forum?id=4rEI2JdHH6" target="_blank">Paper</a>
+    </td>
+    <td>
+      <span class="title" style="FONT-WEIGHT: bold">Accelerating Grokking via Embedding Transfer from a Weaker Model</span>
+      <br>Zhiwei Xu*, <b>Zhiyu Ni*</b>, Yixin Wang<sup>&diams;</sup>, Wei Hu<sup>&diams;</sup>
+      <br>ICLR 2025
+    </td> 
+  </tr>
+ </tbody>
+</table>
+
+<table style="MARGIN-BOTTOM: 10px; FONT-SIZE: 13px; BORDER-COLLAPSE: collapse; TEXT-ALIGN: left; WIDTH: 98%; BACKGROUND-COLOR: #f6fbfe">
+  <tbody>
+  <tr>
+    <td style="FONT-SIZE: 10px; TEXT-ALIGN: center; WIDTH: 60px; BACKGROUND-COLOR: #e2eff9">
       <a href="https://openreview.net/forum?id=PX06pUVs1P" target="_blank">Paper</a>
       <br>
       <a href="https://github.com/zyni2001/ARGS" target="_blank">GitHub</a>
