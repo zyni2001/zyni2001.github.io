@@ -26,6 +26,9 @@ My research interests focus on Trustworthy AI, AI for EDA and neuro-symbolic AI.
 
 # News
 <div style="margin-bottom: 20px;">
+  <p><strong>December 2025</strong> - I'm thrilled to share that I will join <a href="https://ai.meta.com/" target="_blank">Meta</a> as a Research Scientist Intern this summer!</p>
+</div>
+<div style="margin-bottom: 20px;">
   <p><strong>April 2025</strong> - I'm happy to share that I have been selected as a <a href="https://www.dac.com/Attend/Students-Scholarships/Young-Student-Fellow-Program" target="_blank">Young Student Fellow</a> at DAC 2025!</p>
 </div>
 <div style="margin-bottom: 20px;">
