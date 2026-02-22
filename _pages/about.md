@@ -30,6 +30,11 @@ I was raised in [a small county of southwest China](https://www.google.com/maps/
 
 I am a big fan of badminton.
 
+<div style="text-align: center; margin: 16px 0 24px 0;">
+  <img src="/images/badminton-college-rackets.jpg" alt="My badminton rackets from college days" style="max-width: 65%; height: auto; border-radius: 8px;" />
+  <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My rackets from college days.</div>
+</div>
+
 # News
 <div style="margin-bottom: 20px;">
   <p><strong>December 2025</strong> - I'm thrilled to share that I will join <a href="https://ai.meta.com/" target="_blank">Meta</a> as a Research Scientist Intern next summer!</p>
