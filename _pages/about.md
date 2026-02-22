@@ -30,14 +30,15 @@ I was raised in [a small county of southwest China](https://www.google.com/maps/
 
 I am a big fan of badminton.
 
-<div style="text-align: center; margin: 16px 0 24px 0;">
-  <img src="/images/badminton-college-rackets.jpg" alt="My badminton rackets from college days" style="max-width: 65%; height: auto; border-radius: 8px;" />
-  <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My rackets from college days.</div>
-</div>
-
-<div style="text-align: center; margin: 8px 0 24px 0;">
-  <img src="/images/badminton-current-racket.jpg" alt="My current badminton racket" style="max-width: 50%; height: auto; border-radius: 8px;" />
-  <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My current racket.</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; margin: 16px 0 24px 0;">
+  <div style="flex: 1 1 320px; max-width: 480px; text-align: center;">
+    <img src="/images/badminton-college-rackets.jpg" alt="My badminton rackets from college days" style="width: 100%; height: auto; border-radius: 8px;" />
+    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My rackets from college days.</div>
+  </div>
+  <div style="flex: 1 1 260px; max-width: 360px; text-align: center;">
+    <img src="/images/badminton-current-racket.jpg" alt="My current badminton racket" style="width: 100%; height: auto; border-radius: 8px;" />
+    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My current racket.</div>
+  </div>
 </div>
 
 # News
