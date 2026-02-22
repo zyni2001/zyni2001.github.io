@@ -30,16 +30,6 @@ I was raised in [a small county of southwest China](https://www.google.com/maps/
 
 I am a big fan of badminton.
 
-<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; margin: 16px 0 24px 0;">
-  <div style="flex: 1 1 320px; max-width: 480px; text-align: center;">
-    <img src="/images/badminton-college-rackets.jpg" alt="My badminton rackets from college days" style="width: 100%; height: auto; border-radius: 8px;" />
-    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My rackets from college days.</div>
-  </div>
-  <div style="flex: 1 1 260px; max-width: 360px; text-align: center;">
-    <img src="/images/badminton-current-racket.jpg" alt="My current badminton racket" style="width: 100%; height: auto; border-radius: 8px;" />
-    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My current racket.</div>
-  </div>
-</div>
 
 # News
 <div style="margin-bottom: 20px;">
@@ -327,3 +317,16 @@ Student Volunteer at ACM Web Conference (2024). -->
     g.async=true; g.src='https://cdn.matomo.cloud/githublili.matomo.cloud/matomo.js'; s.parentNode.insertBefore(g,s);
   })();
 </script> -->
+
+# My Hobbies
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; align-items: flex-start; margin: 16px 0 24px 0;">
+  <div style="flex: 1 1 260px; max-width: 360px; text-align: center;">
+    <img src="/images/badminton-college-rackets.jpg" alt="My badminton rackets from college days" style="width: 100%; height: auto; border-radius: 8px;" />
+    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My rackets from college days.</div>
+  </div>
+  <div style="flex: 1 1 260px; max-width: 360px; text-align: center;">
+    <img src="/images/badminton-current-racket.jpg" alt="My current badminton racket" style="width: 100%; height: auto; border-radius: 8px;" />
+    <div style="font-size: 0.9em; color: #666; margin-top: 8px;">My current racket.</div>
+  </div>
+</div>
