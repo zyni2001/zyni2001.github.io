@@ -28,6 +28,8 @@ My research interests focus on AI Security, neuro-symbolic AI. Feel free to reac
 
 I was raised in [a small county of southwest China](https://www.google.com/maps/place/Linshui+County,+Guang'An,+Sichuan,+China/@30.2795401,106.6767354,10z/data=!3m1!4b1!4m6!3m5!1s0x3692981bf76fa15d:0xef5e5115e74eb6bf!8m2!3d30.3345799!4d106.93048!16s%2Fm%2F057s1hg?entry=ttu&g_ep=EgoyMDI2MDEyMC4wIKXMDSoASAFQAw%3D%3D) until high school. I finished my high school at [Chengdu Shude High School](https://www.sdzx.net/).
 
+I am a big fan of badminton.
+
 # News
 <div style="margin-bottom: 20px;">
   <p><strong>December 2025</strong> - I'm thrilled to share that I will join <a href="https://ai.meta.com/" target="_blank">Meta</a> as a Research Scientist Intern next summer!</p>
