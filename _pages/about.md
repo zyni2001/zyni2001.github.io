@@ -33,10 +33,10 @@ I am a big fan of badminton.
 
 # News
 <div style="margin-bottom: 20px;">
-  <p><strong>Jan 2026</strong> - We submitted a paper to ACL. It studies auto-formalization for first-order logic and achieves near-ceiling performance across all current benchmarks. arXiv version coming very soon!</p>
+  <p><strong>March 2026</strong> - "<a href="https://arxiv.org/pdf/2603.02788" target="_blank">Agentified Assessment of Logical Reasoning Agents</a>" has been accepted by <a href="https://agentwild-workshop.github.io/" target="_blank">ICLR 2026 (AIWILD) Workshop</a>!</p>
 </div>
 <div style="margin-bottom: 20px;">
-  <p><strong>March 2026</strong> - "<a href="https://arxiv.org/pdf/2603.02788" target="_blank">Agentified Assessment of Logical Reasoning Agents</a>" has been accepted by <a href="https://agentwild-workshop.github.io/" target="_blank">ICLR 2026 (AIWILD) Workshop</a>!</p>
+  <p><strong>Jan 2026</strong> - We submitted a paper to ACL. It studies auto-formalization for first-order logic and achieves near-ceiling performance across all current benchmarks. arXiv version coming very soon!</p>
 </div>
 <div style="margin-bottom: 20px;">
   <p><strong>December 2025</strong> - I'm thrilled to share that I will join <a href="https://ai.meta.com/" target="_blank">Meta</a> as a Research Scientist Intern next summer!</p>
