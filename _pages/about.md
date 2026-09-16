@@ -33,6 +33,9 @@ I am a big fan of badminton.
 
 # News
 <div style="margin-bottom: 20px;">
+  <p><strong>September 2026</strong> - Our paper "ACIES: A Self-Evolving Agentic Contract Framework for Verified Controller Synthesis in Cyber-Physical Systems" has been accepted to the REALM 2026 workshop, co-located with EMNLP 2026!</p>
+</div>
+<div style="margin-bottom: 20px;">
   <p><strong>March 2026</strong> - Our work "<a href="https://arxiv.org/abs/2603.17233" target="_blank">Draft-and-Prune: Improving the Reliability of Auto-formalization for Logical Reasoning</a>" is now available on arXiv!</p>
 </div>
 <div style="margin-bottom: 20px;">
@@ -103,6 +106,16 @@ I am a big fan of badminton.
 
 <span class='anchor' id='publications'></span> -->
 <!-- please refer to [google scholar](https://scholar.google.com/citations?user=r4kIL4cAAAAJ&hl=zh-CN) page to check all my publications. (* Equal Contribution) -->
+
+# Publications
+
+<span class='anchor' id='publications'></span>
+
+- **ACIES: A Self-Evolving Agentic Contract Framework for Verified Controller Synthesis in Cyber-Physical Systems**
+
+  Yifeng Xiao, **Zhiyu Ni**, Dinghong Song, Mi Zhou, Pierluigi Nuzzo
+
+  **REALM 2026 Workshop, co-located with EMNLP 2026**
 
 <!-- <table style="MARGIN-BOTTOM: 10px; FONT-SIZE: 13px; BORDER-COLLAPSE: collapse; TEXT-ALIGN: left; WIDTH: 98%; BACKGROUND-COLOR: #f6fbfe">
   <tbody>
