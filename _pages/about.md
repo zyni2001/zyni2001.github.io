@@ -69,7 +69,7 @@ I am a big fan of badminton.
 # Work Experiences
 
 <div style="margin-bottom: 20px;">
-  <b>Research Scientist Intern, Meta.</b> <span style="float: right;"><b>08/2026-present</b></span>
+  <b>Research Scientist Intern, Meta.</b> <span style="float: right;"><b>05/2026-present</b></span>
   <div style="clear: both; margin-top: 5px;">
     <a href="https://ai.meta.com/">Meta AI</a>
   </div>
