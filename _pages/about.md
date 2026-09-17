@@ -69,6 +69,14 @@ I am a big fan of badminton.
 # Work Experiences
 
 <div style="margin-bottom: 20px;">
+  <b>Research Scientist Intern, Meta.</b> <span style="float: right;"><b>08/2026-present</b></span>
+  <div style="clear: both; margin-top: 5px;">
+    <a href="https://ai.meta.com/">Meta AI</a>
+  </div>
+</div>
+<hr style="border: 0; border-top: 1px solid #ccc;"/>
+
+<div style="margin-bottom: 20px;">
   <b>Research Assistant, Computer Science, UC Berkeley.</b> <span style="float: right;"><b>01/2025-present</b></span>
   <div style="clear: both; margin-top: 5px;">
     Prof. <a href="https://www2.eecs.berkeley.edu/Faculty/Homepages/pnuzzo.html">Pierluigi Nuzzo</a>
@@ -106,16 +114,6 @@ I am a big fan of badminton.
 
 <span class='anchor' id='publications'></span> -->
 <!-- please refer to [google scholar](https://scholar.google.com/citations?user=r4kIL4cAAAAJ&hl=zh-CN) page to check all my publications. (* Equal Contribution) -->
-
-# Publications
-
-<span class='anchor' id='publications'></span>
-
-- **ACIES: A Self-Evolving Agentic Contract Framework for Verified Controller Synthesis in Cyber-Physical Systems**
-
-  Yifeng Xiao, **Zhiyu Ni**, Dinghong Song, Mi Zhou, Pierluigi Nuzzo
-
-  **REALM 2026 Workshop, co-located with EMNLP 2026**
 
 <!-- <table style="MARGIN-BOTTOM: 10px; FONT-SIZE: 13px; BORDER-COLLAPSE: collapse; TEXT-ALIGN: left; WIDTH: 98%; BACKGROUND-COLOR: #f6fbfe">
   <tbody>
