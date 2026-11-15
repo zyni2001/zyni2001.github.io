@@ -34,7 +34,9 @@ jobs:
         if: env.HAS_CREDS == 'true'
         uses: actions/cache@v4
         with:
-          path: /tmp/cities1000.txt
+          path: |
+            /tmp/cities1000.txt
+            /tmp/admin1CodesASCII.txt
           key: geonames-cities1000-${{ github.run_id }}
           restore-keys: geonames-cities1000-
 

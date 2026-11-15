@@ -28,6 +28,8 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets" / "v2" / "visitors.json"
 GEONAMES_URL = "https://download.geonames.org/export/dump/cities1000.zip"
 GEONAMES_CACHE = Path(os.environ.get("GEONAMES_CACHE", "/tmp/cities1000.txt"))
+ADMIN1_URL = "https://download.geonames.org/export/dump/admin1CodesASCII.txt"
+ADMIN1_CACHE = GEONAMES_CACHE.with_name("admin1CodesASCII.txt")
 START_DATE = "2015-08-14"  # earliest date the GA4 Data API accepts
 
 
@@ -37,15 +39,30 @@ def norm(s: str) -> str:
     return " ".join(s.lower().replace("-", " ").replace("'", "").split())
 
 
-def load_geonames() -> tuple[dict, dict]:
-    """Return (primary, alternate) lookups keyed by (country_code, normalized_name)."""
+def load_geonames() -> tuple[dict, dict, dict]:
+    """Return (regional, primary, alternate) lookups.
+
+    regional is keyed by (country_code, normalized_region, normalized_name) so that
+    e.g. Princeton, New Jersey is not confused with Princeton, Florida; the other
+    two are keyed by (country_code, normalized_name) as a fallback.
+    """
     if not GEONAMES_CACHE.exists():
         print(f"downloading {GEONAMES_URL}", file=sys.stderr)
         with urllib.request.urlopen(GEONAMES_URL, timeout=120) as r:
             data = r.read()
         with zipfile.ZipFile(io.BytesIO(data)) as z:
             GEONAMES_CACHE.write_bytes(z.read("cities1000.txt"))
+    if not ADMIN1_CACHE.exists():
+        print(f"downloading {ADMIN1_URL}", file=sys.stderr)
+        with urllib.request.urlopen(ADMIN1_URL, timeout=120) as r:
+            ADMIN1_CACHE.write_bytes(r.read())
 
+    admin1: dict[str, tuple[str, str]] = {}  # "US.NJ" -> (name, ascii name)
+    with ADMIN1_CACHE.open(encoding="utf-8") as f:
+        for row in csv.reader(f, delimiter="\t", quoting=csv.QUOTE_NONE):
+            admin1[row[0]] = (row[1], row[2])
+
+    regional: dict[tuple[str, str, str], tuple[int, float, float]] = {}
     primary: dict[tuple[str, str], tuple[int, float, float]] = {}
     alternate: dict[tuple[str, str], tuple[int, float, float]] = {}
 
@@ -61,12 +78,15 @@ def load_geonames() -> tuple[dict, dict]:
             val = (pop, lat, lng)
             put(primary, (cc, norm(name)), val)
             put(primary, (cc, norm(ascii_name)), val)
+            for region in {norm(r) for r in admin1.get(f"{cc}.{row[10]}", ())}:
+                for n in {norm(name), norm(ascii_name)}:
+                    put(regional, (cc, region, n), val)
             for a in alts.split(",") if alts else ():
                 put(alternate, (cc, norm(a)), val)
-    return primary, alternate
+    return regional, primary, alternate
 
 
-def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, int]], int]:
+def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, str, int]], int]:
     from google.analytics.data_v1beta import BetaAnalyticsDataClient
     from google.analytics.data_v1beta.types import (
         DateRange, Dimension, Metric, RunReportRequest,
@@ -80,13 +100,14 @@ def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, int]], int]:
     while True:
         resp = client.run_report(RunReportRequest(
             property=prop,
-            dimensions=[Dimension(name="city"), Dimension(name="countryId"), Dimension(name="country")],
+            dimensions=[Dimension(name="city"), Dimension(name="region"),
+                        Dimension(name="countryId"), Dimension(name="country")],
             metrics=[Metric(name="totalUsers")],
             date_ranges=rng, limit=10000, offset=offset,
         ))
         for r in resp.rows:
-            city, cc, country = (v.value for v in r.dimension_values)
-            rows.append((city, cc, country, int(r.metric_values[0].value)))
+            city, region, cc, country = (v.value for v in r.dimension_values)
+            rows.append((city, region, cc, country, int(r.metric_values[0].value)))
         offset += len(resp.rows)
         if not resp.rows or offset >= resp.row_count:
             break
@@ -98,15 +119,17 @@ def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, int]], int]:
     return rows, total_users
 
 
-def build(rows, total_users, primary, alternate) -> dict:
+def build(rows, total_users, regional, primary, alternate) -> dict:
     merged: dict[tuple[float, float], dict] = {}
     countries, unmatched = set(), []
-    for city, cc, country, users in rows:
+    for city, region, cc, country, users in rows:
         if cc and cc != "(not set)":
             countries.add(cc)
         if not city or city == "(not set)" or not cc or cc == "(not set)":
             continue
-        hit = primary.get((cc, norm(city))) or alternate.get((cc, norm(city)))
+        hit = (regional.get((cc, norm(region), norm(city)))
+               or primary.get((cc, norm(city)))
+               or alternate.get((cc, norm(city))))
         if not hit:
             unmatched.append(f"{city}, {cc}")
             continue
@@ -132,9 +155,9 @@ def main() -> None:
     if not property_id:
         sys.exit("GA_PROPERTY_ID is not set")
 
-    primary, alternate = load_geonames()
+    regional, primary, alternate = load_geonames()
     rows, total = fetch_ga(property_id)
-    data = build(rows, total, primary, alternate)
+    data = build(rows, total, regional, primary, alternate)
 
     old = json.loads(OUT.read_text()) if OUT.exists() else {}
     if {k: v for k, v in old.items() if k != "updated"} == data:
