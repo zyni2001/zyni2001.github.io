@@ -1,0 +1,68 @@
+name: Update visitor globe
+
+on:
+  schedule:
+    - cron: "17 7 * * *"   # daily, 07:17 UTC
+  workflow_dispatch:        # run manually from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: visitors
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      HAS_CREDS: ${{ secrets.GA_CREDENTIALS != '' && secrets.GA_PROPERTY_ID != '' }}
+    steps:
+      - name: Skip until GA secrets are configured
+        if: env.HAS_CREDS != 'true'
+        run: echo "::notice::Add GA_CREDENTIALS and GA_PROPERTY_ID repo secrets to enable the visitor globe."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_CREDS == 'true'
+
+      - uses: actions/setup-python@v5
+        if: env.HAS_CREDS == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Cache GeoNames cities
+        if: env.HAS_CREDS == 'true'
+        uses: actions/cache@v4
+        with:
+          path: /tmp/cities1000.txt
+          key: geonames-cities1000-${{ github.run_id }}
+          restore-keys: geonames-cities1000-
+
+      - name: Install GA client
+        if: env.HAS_CREDS == 'true'
+        run: pip install "google-analytics-data>=0.17,<1"
+
+      - name: Write credentials
+        if: env.HAS_CREDS == 'true'
+        env:
+          GA_CREDENTIALS: ${{ secrets.GA_CREDENTIALS }}
+        run: printf '%s' "$GA_CREDENTIALS" > "$RUNNER_TEMP/ga.json"
+
+      - name: Pull visitor cities from Google Analytics
+        if: env.HAS_CREDS == 'true'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ runner.temp }}/ga.json
+          GA_PROPERTY_ID: ${{ secrets.GA_PROPERTY_ID }}
+        run: python scripts/update_visitors.py
+
+      - name: Commit if changed
+        if: env.HAS_CREDS == 'true'
+        run: |
+          if git diff --quiet -- assets/v2/visitors.json; then
+            echo "visitors.json unchanged"; exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/v2/visitors.json
+          git commit -m "Update visitor globe data"
+          git push
