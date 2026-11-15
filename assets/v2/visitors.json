@@ -1,23 +1,9 @@
 {
  "updated": "2026-11-15",
- "visitors": 2838,
- "cities": 304,
- "countries": 35,
+ "visitors": 1174,
+ "cities": 299,
+ "countries": 34,
  "points": [
-  {
-   "city": "Singapore",
-   "country": "Singapore",
-   "lat": 1.29,
-   "lng": 103.85,
-   "users": 1084
-  },
-  {
-   "city": "Lanzhou",
-   "country": "China",
-   "lat": 36.06,
-   "lng": 103.84,
-   "users": 470
-  },
   {
    "city": "Los Angeles",
    "country": "United States",
@@ -31,13 +17,6 @@
    "lat": 37.87,
    "lng": -122.27,
    "users": 99
-  },
-  {
-   "city": "Council Bluffs",
-   "country": "United States",
-   "lat": 41.26,
-   "lng": -95.86,
-   "users": 92
   },
   {
    "city": "San Jose",
@@ -115,13 +94,6 @@
    "lat": 37.35,
    "lng": -121.96,
    "users": 19
-  },
-  {
-   "city": "Ashburn",
-   "country": "United States",
-   "lat": 39.04,
-   "lng": -77.49,
-   "users": 17
   },
   {
    "city": "Beijing",
@@ -1724,13 +1696,6 @@
    "country": "South Africa",
    "lat": -25.74,
    "lng": 28.19,
-   "users": 1
-  },
-  {
-   "city": "Prineville",
-   "country": "United States",
-   "lat": 44.3,
-   "lng": -120.83,
    "users": 1
   },
   {

@@ -32,6 +32,33 @@ ADMIN1_URL = "https://download.geonames.org/export/dump/admin1CodesASCII.txt"
 ADMIN1_CACHE = GEONAMES_CACHE.with_name("admin1CodesASCII.txt")
 START_DATE = "2015-08-14"  # earliest date the GA4 Data API accepts
 
+# Traffic from these places is overwhelmingly crawlers / cloud servers, not people.
+# (country, region or None for any region, city)
+EXCLUDE = {
+    # cloud data-center towns
+    ("US", "Iowa", "Council Bluffs"),     # Google
+    ("US", "Virginia", "Ashburn"),        # AWS / "Data Center Alley"
+    ("US", "Oregon", "Boardman"),         # AWS
+    ("US", "Oregon", "The Dalles"),       # Google
+    ("US", "Oregon", "Prineville"),       # Meta / Apple
+    ("US", "Washington", "Quincy"),       # Microsoft / Yahoo
+    ("US", "South Carolina", "Moncks Corner"),  # Google
+    ("US", "North Carolina", "Lenoir"),   # Google
+    ("US", "North Carolina", "Forest City"),    # Meta
+    ("US", "Iowa", "Altoona"),            # Meta
+    ("US", "Nebraska", "Papillion"),      # Meta
+    ("US", "Oklahoma", "Pryor"),          # Google
+    # crawler-dominated spikes seen in this site's analytics
+    ("SG", None, "Singapore"),
+    ("CN", "Gansu", "Lanzhou"),
+}
+
+
+def excluded(cc: str, region: str, city: str) -> bool:
+    c, r = norm(city), norm(region)
+    return any(cc == ecc and c == norm(ecity) and (er is None or r == norm(er))
+               for ecc, er, ecity in EXCLUDE)
+
 
 def norm(s: str) -> str:
     s = unicodedata.normalize("NFKD", s)
@@ -121,8 +148,11 @@ def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, str, int]], in
 
 def build(rows, total_users, regional, primary, alternate) -> dict:
     merged: dict[tuple[float, float], dict] = {}
-    countries, unmatched = set(), []
+    countries, unmatched, dropped = set(), [], 0
     for city, region, cc, country, users in rows:
+        if excluded(cc, region, city):
+            dropped += users
+            continue
         if cc and cc != "(not set)":
             countries.add(cc)
         if not city or city == "(not set)" or not cc or cc == "(not set)":
@@ -138,12 +168,14 @@ def build(rows, total_users, regional, primary, alternate) -> dict:
         p = merged.setdefault(key, {"city": city, "country": country, "lat": key[0], "lng": key[1], "users": 0})
         p["users"] += users
 
+    if dropped:
+        print(f"excluded {dropped} users from crawler / data-center locations", file=sys.stderr)
     if unmatched:
         print(f"{len(unmatched)} unmatched cities: {', '.join(unmatched[:40])}", file=sys.stderr)
 
     points = sorted(merged.values(), key=lambda p: (-p["users"], p["city"]))
     return {
-        "visitors": total_users,
+        "visitors": max(total_users - dropped, sum(p["users"] for p in points)),
         "cities": len(points),
         "countries": len(countries),
         "points": points,
