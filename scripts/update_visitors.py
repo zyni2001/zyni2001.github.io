@@ -48,10 +48,15 @@ EXCLUDE = {
     ("US", "Iowa", "Altoona"),            # Meta
     ("US", "Nebraska", "Papillion"),      # Meta
     ("US", "Oklahoma", "Pryor"),          # Google
-    # crawler-dominated spikes seen in this site's analytics
-    ("SG", None, "Singapore"),
-    ("CN", "Gansu", "Lanzhou"),
 }
+
+# Bot filtering for everywhere else. GA4 marks a session "engaged" when the visitor
+# stays 10+ s, views 2+ pages, or converts; crawlers almost never do. For any city
+# with at least MIN_SESSIONS sessions whose engaged share is below BOT_RATIO x the
+# site's typical share, users are scaled down to the human-looking fraction, so
+# e.g. Singapore keeps its real visitors while its crawler spike is removed.
+MIN_SESSIONS = 20
+BOT_RATIO = 0.5
 
 
 def excluded(cc: str, region: str, city: str) -> bool:
@@ -113,7 +118,7 @@ def load_geonames() -> tuple[dict, dict, dict]:
     return regional, primary, alternate
 
 
-def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, str, int]], int]:
+def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, str, int, int, int]], int]:
     from google.analytics.data_v1beta import BetaAnalyticsDataClient
     from google.analytics.data_v1beta.types import (
         DateRange, Dimension, Metric, RunReportRequest,
@@ -129,12 +134,13 @@ def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, str, int]], in
             property=prop,
             dimensions=[Dimension(name="city"), Dimension(name="region"),
                         Dimension(name="countryId"), Dimension(name="country")],
-            metrics=[Metric(name="totalUsers")],
+            metrics=[Metric(name="totalUsers"), Metric(name="sessions"), Metric(name="engagedSessions")],
             date_ranges=rng, limit=10000, offset=offset,
         ))
         for r in resp.rows:
             city, region, cc, country = (v.value for v in r.dimension_values)
-            rows.append((city, region, cc, country, int(r.metric_values[0].value)))
+            users, sessions, engaged = (int(m.value) for m in r.metric_values)
+            rows.append((city, region, cc, country, users, sessions, engaged))
         offset += len(resp.rows)
         if not resp.rows or offset >= resp.row_count:
             break
@@ -146,12 +152,35 @@ def fetch_ga(property_id: str) -> tuple[list[tuple[str, str, str, str, int]], in
     return rows, total_users
 
 
+def typical_engagement(rows) -> float | None:
+    """Median engaged-session share across cities with enough traffic."""
+    rates = sorted(e / s for city, region, cc, _, _, s, e in rows
+                   if s >= MIN_SESSIONS and not excluded(cc, region, city))
+    return rates[len(rates) // 2] if rates else None
+
+
+def human_users(users: int, sessions: int, engaged: int, typical: float | None) -> int:
+    if not typical or sessions < MIN_SESSIONS:
+        return users
+    rate = engaged / sessions
+    if rate >= BOT_RATIO * typical:
+        return users
+    return round(users * rate / typical)
+
+
 def build(rows, total_users, regional, primary, alternate) -> dict:
     merged: dict[tuple[float, float], dict] = {}
-    countries, unmatched, dropped = set(), [], 0
-    for city, region, cc, country, users in rows:
+    countries, unmatched, dropped, trimmed = set(), [], 0, []
+    typical = typical_engagement(rows)
+    for city, region, cc, country, raw_users, sessions, engaged in rows:
         if excluded(cc, region, city):
-            dropped += users
+            dropped += raw_users
+            continue
+        users = human_users(raw_users, sessions, engaged, typical)
+        if users < raw_users:
+            dropped += raw_users - users
+            trimmed.append(f"{city} {raw_users}->{users}")
+        if users <= 0:
             continue
         if cc and cc != "(not set)":
             countries.add(cc)
@@ -168,8 +197,12 @@ def build(rows, total_users, regional, primary, alternate) -> dict:
         p = merged.setdefault(key, {"city": city, "country": country, "lat": key[0], "lng": key[1], "users": 0})
         p["users"] += users
 
+    if typical is not None:
+        print(f"typical engaged-session share: {typical:.2f}", file=sys.stderr)
+    if trimmed:
+        print(f"bot-trimmed cities: {', '.join(trimmed)}", file=sys.stderr)
     if dropped:
-        print(f"excluded {dropped} users from crawler / data-center locations", file=sys.stderr)
+        print(f"removed {dropped} users from data-center locations and bot traffic", file=sys.stderr)
     if unmatched:
         print(f"{len(unmatched)} unmatched cities: {', '.join(unmatched[:40])}", file=sys.stderr)
 
