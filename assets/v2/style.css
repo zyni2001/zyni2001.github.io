@@ -272,6 +272,7 @@ kbd {
 .about__text p { margin: 0 0 22px; color: var(--muted); }
 .about__text strong { color: var(--text); font-weight: 500; }
 .about__text .big { font-size: clamp(21px, 2.1vw, 26px); line-height: 1.45; letter-spacing: -.012em; color: var(--text); }
+.about__text .big em { font-family: var(--serif); font-style: italic; font-size: 1.12em; color: var(--text); }
 .hl { font-family: var(--serif); font-style: italic; font-size: 1.12em; color: var(--accent); }
 .link { color: var(--text); background: linear-gradient(var(--accent), var(--accent)) 0 100% / 0 1px no-repeat, linear-gradient(var(--line-2), var(--line-2)) 0 100% / 100% 1px no-repeat; transition: background-size .45s var(--ease); padding-bottom: 1px; }
 .link:hover { background-size: 100% 1px, 100% 1px; }
