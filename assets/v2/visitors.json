@@ -1,15 +1,15 @@
 {
  "updated": "2026-11-15",
- "visitors": 1174,
+ "visitors": 1200,
  "cities": 299,
- "countries": 34,
+ "countries": 35,
  "points": [
   {
    "city": "Los Angeles",
    "country": "United States",
    "lat": 34.05,
    "lng": -118.24,
-   "users": 107
+   "users": 106
   },
   {
    "city": "Berkeley",
@@ -26,6 +26,13 @@
    "users": 85
   },
   {
+   "city": "Singapore",
+   "country": "Singapore",
+   "lat": 1.29,
+   "lng": 103.85,
+   "users": 51
+  },
+  {
    "city": "New York",
    "country": "United States",
    "lat": 40.71,
@@ -33,25 +40,18 @@
    "users": 33
   },
   {
+   "city": "Menlo Park",
+   "country": "United States",
+   "lat": 37.45,
+   "lng": -122.18,
+   "users": 30
+  },
+  {
    "city": "San Francisco",
    "country": "United States",
    "lat": 37.77,
    "lng": -122.42,
    "users": 29
-  },
-  {
-   "city": "Menlo Park",
-   "country": "United States",
-   "lat": 37.45,
-   "lng": -122.18,
-   "users": 28
-  },
-  {
-   "city": "Aspen",
-   "country": "United States",
-   "lat": 39.19,
-   "lng": -106.82,
-   "users": 27
   },
   {
    "city": "Hong Kong",
@@ -103,6 +103,13 @@
    "users": 15
   },
   {
+   "city": "Glenview",
+   "country": "United States",
+   "lat": 42.07,
+   "lng": -87.79,
+   "users": 14
+  },
+  {
    "city": "Chicago",
    "country": "United States",
    "lat": 41.85,
@@ -110,17 +117,10 @@
    "users": 13
   },
   {
-   "city": "Glenview",
-   "country": "United States",
-   "lat": 42.07,
-   "lng": -87.79,
-   "users": 13
-  },
-  {
    "city": "Albany",
    "country": "United States",
-   "lat": 42.65,
-   "lng": -73.76,
+   "lat": 37.89,
+   "lng": -122.3,
    "users": 12
   },
   {
@@ -164,6 +164,13 @@
    "lat": 22.55,
    "lng": 114.07,
    "users": 12
+  },
+  {
+   "city": "Lanzhou",
+   "country": "China",
+   "lat": 36.06,
+   "lng": 103.84,
+   "users": 11
   },
   {
    "city": "Stanford",
@@ -315,8 +322,8 @@
   {
    "city": "Princeton",
    "country": "United States",
-   "lat": 25.54,
-   "lng": -80.41,
+   "lat": 40.35,
+   "lng": -74.66,
    "users": 5
   },
   {
@@ -331,13 +338,6 @@
    "country": "United States",
    "lat": 37.23,
    "lng": -80.41,
-   "users": 4
-  },
-  {
-   "city": "College Park",
-   "country": "United States",
-   "lat": 38.98,
-   "lng": -76.94,
    "users": 4
   },
   {
@@ -388,13 +388,6 @@
    "lat": 41.66,
    "lng": -83.56,
    "users": 4
-  },
-  {
-   "city": "Boardman",
-   "country": "United States",
-   "lat": 41.02,
-   "lng": -80.66,
-   "users": 3
   },
   {
    "city": "Champaign",
@@ -490,8 +483,8 @@
   {
    "city": "Alhambra",
    "country": "United States",
-   "lat": 33.5,
-   "lng": -112.13,
+   "lat": 34.1,
+   "lng": -118.13,
    "users": 2
   },
   {
@@ -516,13 +509,6 @@
    "users": 2
   },
   {
-   "city": "Belmont",
-   "country": "United States",
-   "lat": 37.52,
-   "lng": -122.28,
-   "users": 2
-  },
-  {
    "city": "Boulder",
    "country": "United States",
    "lat": 40.01,
@@ -541,6 +527,20 @@
    "country": "United States",
    "lat": 35.91,
    "lng": -79.06,
+   "users": 2
+  },
+  {
+   "city": "College Park",
+   "country": "United States",
+   "lat": 33.65,
+   "lng": -84.45,
+   "users": 2
+  },
+  {
+   "city": "College Park",
+   "country": "United States",
+   "lat": 38.98,
+   "lng": -76.94,
    "users": 2
   },
   {
@@ -588,8 +588,8 @@
   {
    "city": "Lancaster",
    "country": "United States",
-   "lat": 34.7,
-   "lng": -118.14,
+   "lat": 40.04,
+   "lng": -76.31,
    "users": 2
   },
   {
@@ -637,8 +637,8 @@
   {
    "city": "Pasadena",
    "country": "United States",
-   "lat": 29.69,
-   "lng": -95.21,
+   "lat": 34.15,
+   "lng": -118.14,
    "users": 2
   },
   {
@@ -646,6 +646,13 @@
    "country": "United States",
    "lat": 33.45,
    "lng": -112.07,
+   "users": 2
+  },
+  {
+   "city": "Quincy",
+   "country": "United States",
+   "lat": 39.94,
+   "lng": -120.95,
    "users": 2
   },
   {
@@ -763,8 +770,8 @@
   {
    "city": "Abbeville",
    "country": "United States",
-   "lat": 29.97,
-   "lng": -92.13,
+   "lat": 34.18,
+   "lng": -82.38,
    "users": 1
   },
   {
@@ -784,8 +791,8 @@
   {
    "city": "Acton",
    "country": "United States",
-   "lat": 42.49,
-   "lng": -71.43,
+   "lat": 34.47,
+   "lng": -118.2,
    "users": 1
   },
   {
@@ -854,15 +861,15 @@
   {
    "city": "Astoria",
    "country": "United States",
-   "lat": 40.77,
-   "lng": -73.93,
+   "lat": 46.19,
+   "lng": -123.83,
    "users": 1
   },
   {
    "city": "Auburn",
    "country": "United States",
-   "lat": 47.31,
-   "lng": -122.23,
+   "lat": 38.9,
+   "lng": -121.08,
    "users": 1
   },
   {
@@ -898,6 +905,20 @@
    "country": "United States",
    "lat": 42.28,
    "lng": -72.4,
+   "users": 1
+  },
+  {
+   "city": "Belmont",
+   "country": "United States",
+   "lat": 37.52,
+   "lng": -122.28,
+   "users": 1
+  },
+  {
+   "city": "Belmont",
+   "country": "United States",
+   "lat": 42.4,
+   "lng": -71.18,
    "users": 1
   },
   {
@@ -938,8 +959,8 @@
   {
    "city": "Brentwood",
    "country": "United States",
-   "lat": 40.78,
-   "lng": -73.25,
+   "lat": 37.93,
+   "lng": -121.7,
    "users": 1
   },
   {
@@ -1015,8 +1036,8 @@
   {
    "city": "Clayton",
    "country": "United States",
-   "lat": 35.65,
-   "lng": -78.46,
+   "lat": 38.64,
+   "lng": -90.32,
    "users": 1
   },
   {
@@ -1057,8 +1078,8 @@
   {
    "city": "Dayton",
    "country": "United States",
-   "lat": 39.76,
-   "lng": -84.19,
+   "lat": 30.05,
+   "lng": -94.89,
    "users": 1
   },
   {
@@ -1132,13 +1153,6 @@
    "users": 1
   },
   {
-   "city": "Falkenstein",
-   "country": "Germany",
-   "lat": 50.48,
-   "lng": 12.37,
-   "users": 1
-  },
-  {
    "city": "Farmington Hills",
    "country": "United States",
    "lat": 42.49,
@@ -1148,8 +1162,8 @@
   {
    "city": "Fort Bragg",
    "country": "United States",
-   "lat": 35.14,
-   "lng": -79.01,
+   "lat": 39.45,
+   "lng": -123.81,
    "users": 1
   },
   {
@@ -1197,22 +1211,15 @@
   {
    "city": "Georgetown",
    "country": "United States",
-   "lat": 30.63,
-   "lng": -97.68,
-   "users": 1
-  },
-  {
-   "city": "Gilroy",
-   "country": "United States",
-   "lat": 37.01,
-   "lng": -121.57,
+   "lat": 38.21,
+   "lng": -84.56,
    "users": 1
   },
   {
    "city": "Glenwood",
    "country": "United States",
-   "lat": 41.54,
-   "lng": -87.6,
+   "lat": 34.33,
+   "lng": -93.55,
    "users": 1
   },
   {
@@ -1302,8 +1309,8 @@
   {
    "city": "Jacksonville",
    "country": "United States",
-   "lat": 30.33,
-   "lng": -81.66,
+   "lat": 33.81,
+   "lng": -85.76,
    "users": 1
   },
   {
@@ -1372,8 +1379,8 @@
   {
    "city": "Lafayette",
    "country": "United States",
-   "lat": 30.22,
-   "lng": -92.02,
+   "lat": 40.42,
+   "lng": -86.88,
    "users": 1
   },
   {
@@ -1400,15 +1407,15 @@
   {
    "city": "Lansing",
    "country": "United States",
-   "lat": 42.73,
-   "lng": -84.56,
+   "lat": 42.48,
+   "lng": -76.48,
    "users": 1
   },
   {
    "city": "Lexington",
    "country": "United States",
-   "lat": 37.99,
-   "lng": -84.48,
+   "lat": 42.45,
+   "lng": -71.22,
    "users": 1
   },
   {
@@ -1470,8 +1477,8 @@
   {
    "city": "Medina",
    "country": "United States",
-   "lat": 41.14,
-   "lng": -81.86,
+   "lat": 47.62,
+   "lng": -122.23,
    "users": 1
   },
   {
@@ -1603,8 +1610,8 @@
   {
    "city": "Oak Ridge",
    "country": "United States",
-   "lat": 36.01,
-   "lng": -84.27,
+   "lat": 28.47,
+   "lng": -81.42,
    "users": 1
   },
   {
@@ -1710,13 +1717,6 @@
    "country": "United States",
    "lat": 39.14,
    "lng": -77.71,
-   "users": 1
-  },
-  {
-   "city": "Quincy",
-   "country": "United States",
-   "lat": 42.25,
-   "lng": -71.0,
    "users": 1
   },
   {
@@ -1841,8 +1841,8 @@
   {
    "city": "Silver Springs",
    "country": "United States",
-   "lat": 29.22,
-   "lng": -82.06,
+   "lat": 39.42,
+   "lng": -119.22,
    "users": 1
   },
   {
@@ -1869,8 +1869,8 @@
   {
    "city": "Spencer",
    "country": "United States",
-   "lat": 43.14,
-   "lng": -95.14,
+   "lat": 35.69,
+   "lng": -80.43,
    "users": 1
   },
   {
@@ -1960,8 +1960,8 @@
   {
    "city": "Troy",
    "country": "United States",
-   "lat": 42.61,
-   "lng": -83.15,
+   "lat": 42.73,
+   "lng": -73.69,
    "users": 1
   },
   {
@@ -1981,8 +1981,8 @@
   {
    "city": "Wakefield",
    "country": "United States",
-   "lat": 40.9,
-   "lng": -73.85,
+   "lat": 42.51,
+   "lng": -71.07,
    "users": 1
   },
   {
@@ -2051,8 +2051,8 @@
   {
    "city": "Winchester",
    "country": "United States",
-   "lat": 36.13,
-   "lng": -115.12,
+   "lat": 42.45,
+   "lng": -71.14,
    "users": 1
   },
   {
