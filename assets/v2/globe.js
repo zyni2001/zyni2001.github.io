@@ -103,8 +103,14 @@ new IntersectionObserver(async ([e], obs) => {
   if (!e.isIntersecting) return;
   obs.disconnect();
   try {
-    const res = await fetch('assets/v2/visitors.json', { cache: 'no-cache' });
-    const data = await res.json();
+    // Bot commits do not trigger a branch-based GitHub Pages build.
+    const latestData = 'https://raw.githubusercontent.com/zyni2001/zyni2001.github.io/master/assets/v2/visitors.json';
+    const readData = async (url) => {
+      const response = await fetch(url, { cache: 'no-cache' });
+      if (!response.ok) throw new Error(`Visitor data request failed: ${response.status}`);
+      return response.json();
+    };
+    const data = await readData(latestData).catch(() => readData('assets/v2/visitors.json'));
     points = (data.points || []).filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
     fillStats(data);
   } catch (err) {
