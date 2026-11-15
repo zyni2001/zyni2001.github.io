@@ -260,14 +260,13 @@ kbd {
 }
 .portrait__frame img {
   width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%;
-  filter: grayscale(.85) contrast(1.05) brightness(.95);
-  transform: scale(1.06); transition: filter 1s var(--ease), transform 1.2s var(--ease);
+  transition: transform 1.2s var(--ease);
 }
 .portrait__frame::after {
   content: ""; position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, color-mix(in srgb, var(--bg) 55%, transparent), transparent 40%);
 }
-.portrait:hover img { filter: grayscale(0) contrast(1) brightness(1); transform: scale(1); }
+.portrait:hover img { transform: scale(1.03); }
 .portrait figcaption { display: flex; justify-content: space-between; margin-top: 14px; font-size: 13px; color: var(--muted); }
 
 .about__text p { margin: 0 0 22px; color: var(--muted); }
