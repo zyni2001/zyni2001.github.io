@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-15",
- "visitors": 1200,
+ "updated": "2026-11-16",
+ "visitors": 1201,
  "cities": 299,
  "countries": 35,
  "points": [
@@ -16,7 +16,7 @@
    "country": "United States",
    "lat": 37.87,
    "lng": -122.27,
-   "users": 99
+   "users": 101
   },
   {
    "city": "San Jose",
@@ -51,7 +51,7 @@
    "country": "United States",
    "lat": 37.77,
    "lng": -122.42,
-   "users": 29
+   "users": 30
   },
   {
    "city": "Hong Kong",
@@ -523,24 +523,10 @@
    "users": 2
   },
   {
-   "city": "Chapel Hill",
-   "country": "United States",
-   "lat": 35.91,
-   "lng": -79.06,
-   "users": 2
-  },
-  {
    "city": "College Park",
    "country": "United States",
    "lat": 33.65,
    "lng": -84.45,
-   "users": 2
-  },
-  {
-   "city": "College Park",
-   "country": "United States",
-   "lat": 38.98,
-   "lng": -76.94,
    "users": 2
   },
   {
@@ -1006,17 +992,17 @@
    "users": 1
   },
   {
+   "city": "Chapel Hill",
+   "country": "United States",
+   "lat": 35.91,
+   "lng": -79.06,
+   "users": 1
+  },
+  {
    "city": "Charlottesville",
    "country": "United States",
    "lat": 38.03,
    "lng": -78.48,
-   "users": 1
-  },
-  {
-   "city": "Cherryland",
-   "country": "United States",
-   "lat": 37.68,
-   "lng": -122.1,
    "users": 1
   },
   {
@@ -1038,6 +1024,13 @@
    "country": "United States",
    "lat": 38.64,
    "lng": -90.32,
+   "users": 1
+  },
+  {
+   "city": "College Park",
+   "country": "United States",
+   "lat": 38.98,
+   "lng": -76.94,
    "users": 1
   },
   {
@@ -1153,6 +1146,13 @@
    "users": 1
   },
   {
+   "city": "Falkenstein",
+   "country": "Germany",
+   "lat": 50.48,
+   "lng": 12.37,
+   "users": 1
+  },
+  {
    "city": "Farmington Hills",
    "country": "United States",
    "lat": 42.49,
@@ -1213,6 +1213,13 @@
    "country": "United States",
    "lat": 38.21,
    "lng": -84.56,
+   "users": 1
+  },
+  {
+   "city": "Gilroy",
+   "country": "United States",
+   "lat": 37.01,
+   "lng": -121.57,
    "users": 1
   },
   {
@@ -1997,13 +2004,6 @@
    "country": "United States",
    "lat": 36.91,
    "lng": -121.76,
-   "users": 1
-  },
-  {
-   "city": "Waukesha",
-   "country": "United States",
-   "lat": 43.01,
-   "lng": -88.23,
    "users": 1
   },
   {
