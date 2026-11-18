@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-17",
- "visitors": 1210,
+ "updated": "2026-11-18",
+ "visitors": 1215,
  "cities": 301,
  "countries": 35,
  "points": [
@@ -75,6 +75,13 @@
    "users": 21
   },
   {
+   "city": "Santa Clara",
+   "country": "United States",
+   "lat": 37.35,
+   "lng": -121.96,
+   "users": 20
+  },
+  {
    "city": "Ann Arbor",
    "country": "United States",
    "lat": 42.28,
@@ -89,11 +96,11 @@
    "users": 19
   },
   {
-   "city": "Santa Clara",
+   "city": "Glenview",
    "country": "United States",
-   "lat": 37.35,
-   "lng": -121.96,
-   "users": 19
+   "lat": 42.07,
+   "lng": -87.79,
+   "users": 16
   },
   {
    "city": "Beijing",
@@ -103,11 +110,11 @@
    "users": 15
   },
   {
-   "city": "Glenview",
+   "city": "Boston",
    "country": "United States",
-   "lat": 42.07,
-   "lng": -87.79,
-   "users": 14
+   "lat": 42.36,
+   "lng": -71.06,
+   "users": 13
   },
   {
    "city": "Chicago",
@@ -128,13 +135,6 @@
    "country": "United States",
    "lat": 30.27,
    "lng": -97.74,
-   "users": 12
-  },
-  {
-   "city": "Boston",
-   "country": "United States",
-   "lat": 42.36,
-   "lng": -71.06,
    "users": 12
   },
   {
@@ -576,6 +576,13 @@
    "country": "United States",
    "lat": 41.76,
    "lng": -72.69,
+   "users": 2
+  },
+  {
+   "city": "Hyattsville",
+   "country": "United States",
+   "lat": 38.96,
+   "lng": -76.95,
    "users": 2
   },
   {
@@ -1297,13 +1304,6 @@
    "country": "United States",
    "lat": 33.98,
    "lng": -118.23,
-   "users": 1
-  },
-  {
-   "city": "Hyattsville",
-   "country": "United States",
-   "lat": 38.96,
-   "lng": -76.95,
    "users": 1
   },
   {
