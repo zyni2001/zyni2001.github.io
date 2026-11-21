@@ -1,6 +1,6 @@
 {
- "updated": "2026-11-18",
- "visitors": 1215,
+ "updated": "2026-11-21",
+ "visitors": 1216,
  "cities": 301,
  "countries": 35,
  "points": [
@@ -208,6 +208,13 @@
    "users": 9
   },
   {
+   "city": "Palo Alto",
+   "country": "United States",
+   "lat": 37.44,
+   "lng": -122.14,
+   "users": 9
+  },
+  {
    "city": "Pittsburgh",
    "country": "United States",
    "lat": 40.44,
@@ -219,13 +226,6 @@
    "country": "United States",
    "lat": 33.67,
    "lng": -117.82,
-   "users": 8
-  },
-  {
-   "city": "Palo Alto",
-   "country": "United States",
-   "lat": 37.44,
-   "lng": -122.14,
    "users": 8
   },
   {
