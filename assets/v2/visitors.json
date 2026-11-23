@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-22",
- "visitors": 1218,
- "cities": 302,
+ "updated": "2026-11-23",
+ "visitors": 1222,
+ "cities": 303,
  "countries": 36,
  "points": [
   {
@@ -9,7 +9,7 @@
    "country": "United States",
    "lat": 34.05,
    "lng": -118.24,
-   "users": 108
+   "users": 109
   },
   {
    "city": "Berkeley",
@@ -68,18 +68,18 @@
    "users": 23
   },
   {
+   "city": "Santa Clara",
+   "country": "United States",
+   "lat": 37.35,
+   "lng": -121.96,
+   "users": 21
+  },
+  {
    "city": "Seattle",
    "country": "United States",
    "lat": 47.61,
    "lng": -122.33,
    "users": 21
-  },
-  {
-   "city": "Santa Clara",
-   "country": "United States",
-   "lat": 37.35,
-   "lng": -121.96,
-   "users": 20
   },
   {
    "city": "Ann Arbor",
@@ -100,7 +100,7 @@
    "country": "United States",
    "lat": 42.07,
    "lng": -87.79,
-   "users": 16
+   "users": 17
   },
   {
    "city": "Beijing",
@@ -1486,6 +1486,13 @@
    "country": "Canada",
    "lat": 43.87,
    "lng": -79.27,
+   "users": 1
+  },
+  {
+   "city": "Meadow Woods",
+   "country": "United States",
+   "lat": 28.39,
+   "lng": -81.37,
    "users": 1
   },
   {
