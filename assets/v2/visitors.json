@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-24",
- "visitors": 1224,
- "cities": 304,
+ "updated": "2026-11-25",
+ "visitors": 1226,
+ "cities": 305,
  "countries": 36,
  "points": [
   {
@@ -16,7 +16,7 @@
    "country": "United States",
    "lat": 37.87,
    "lng": -122.27,
-   "users": 103
+   "users": 104
   },
   {
    "city": "San Jose",
@@ -1990,6 +1990,13 @@
    "country": "United States",
    "lat": 42.73,
    "lng": -73.69,
+   "users": 1
+  },
+  {
+   "city": "Tualatin",
+   "country": "United States",
+   "lat": 45.38,
+   "lng": -122.76,
    "users": 1
   },
   {
