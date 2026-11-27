@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-26",
- "visitors": 1235,
- "cities": 308,
+ "updated": "2026-11-27",
+ "visitors": 1236,
+ "cities": 309,
  "countries": 37,
  "points": [
   {
@@ -1283,6 +1283,13 @@
    "country": "Armenia",
    "lat": 40.79,
    "lng": 43.85,
+   "users": 1
+  },
+  {
+   "city": "Haarlem",
+   "country": "Netherlands",
+   "lat": 52.38,
+   "lng": 4.64,
    "users": 1
   },
   {
