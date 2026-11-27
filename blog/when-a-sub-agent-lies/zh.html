@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="zh" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>当一个子 Agent 撒谎时</title>
+<meta name="description" content="用来源契约防护多 agent LLM 系统中谎报关键值的子 agent：威胁、轻量运行时防护、实测与「检测≠安全」。">
+<meta name="author" content="Zhiyu Ni">
+<meta property="og:type" content="article">
+<meta property="og:title" content="当一个子 Agent 撒谎时">
+<meta property="og:description" content="多 agent LLM 系统里谎报关键值的子 agent，以及一个轻量的运行时防护。">
+<meta property="og:url" content="https://zyni2001.github.io/blog/when-a-sub-agent-lies/zh.html">
+<link rel="canonical" href="https://zyni2001.github.io/blog/when-a-sub-agent-lies/zh.html">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+/* Chinese body face stack layered on the shared tokens */
+:root{ --serif:"Newsreader","Noto Serif SC",Georgia,"Songti SC","SimSun",serif; }
+body{ letter-spacing:.01em; }
+</style>
+</head>
+<body>
+<div class="langbar"><a href="./">EN</a><span>·</span><a href="zh.html" aria-current="page">中文</a></div>
+
+<div class="layout">
+<main class="main">
+<header>
+  <div class="key">多 Agent 系统 · AI 安全 · 可验证 Agent</div>
+  <h1>当一个子 Agent 撒谎时</h1>
+  <p class="lede">总管 LLM 很少自己碰数据，它根据子 agent 的汇报行动。只要一个子 agent 报错一个值，总管就会用攻击者的数字，去执行用户本来要做的正当动作。Prompt-injection 防御看不到这一层，换更强的模型也解决不了。本文在 MultiAgentDojo 上把这个威胁走一遍，并问一个很窄的问题：一个轻量的<em>来源契约（provenance contract）</em>能不能堵住它，代价多大？</p>
+  <div class="byline">
+    <span>倪志宇 Zhiyu Ni</span>
+    <span>·</span>
+    <span>UC Berkeley EECS</span>
+    <span>·</span>
+    <span>2026 年 11 月</span>
+    <span>·</span>
+    <a href="https://github.com/zyni2001">github.com/zyni2001</a>
+  </div>
+</header>
+
+<h2 id="s1"><span class="num">1 / 动机</span>总管只相信别人转述给它的</h2>
+<p>Agentic 系统越来越多地把一个任务拆给几个 LLM agent。一种常见形态，也是 <a href="https://arxiv.org/abs/2610.05640">MultiAgentDojo</a> 采用的，是一个<em>总管（orchestrator）</em>自己不带工具，加上一组各自拥有一部分工具的<em>子 agent</em>。总管做规划；它把一个子 agent 当函数调用，给它一段自然语言任务；子 agent 跑自己的工具，再用自然语言汇报；总管读这段文字，决定下一次调用。</p>
+<p>这种拆分在权限和上下文上很划算：文件 agent 读文件，银行 agent 转账，谁也做不了对方的活。但它引入了一个不易察觉的假设。<em>总管永远看不到工具的原始输出</em>，它看到的是子 agent 对那个输出的<em>转述</em>。每一个关键值——收款账号、邮箱地址、网址——都要经过一个模型，被重新生成成自由文本。接收方分不清哪个值是从工具原样照抄的，哪个是模型自己写的。</p>
+
+<figure>
+  <div class="fig">
+  <svg viewBox="0 0 580 150" role="img" aria-label="总管调用子 agent，子 agent 运行工具并用自然语言汇报；总管从不直接看到原始工具输出。">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+    <rect class="bx" x="14" y="55" width="104" height="40" rx="6"/><text class="t" x="66" y="79" text-anchor="middle">总管</text>
+    <rect class="bx" x="238" y="55" width="104" height="40" rx="6"/><text class="t" x="290" y="79" text-anchor="middle">子 agent</text>
+    <rect class="bx sys" x="462" y="55" width="104" height="40" rx="6"/><text class="t" x="514" y="79" text-anchor="middle" fill="var(--cool)">工具</text>
+    <line class="ln" x1="118" y1="68" x2="235" y2="68" marker-end="url(#ah)"/><text class="s" x="176" y="60" text-anchor="middle">任务（自然语言）</text>
+    <line class="ln" x1="342" y1="68" x2="459" y2="68" marker-end="url(#ah)"/><text class="s" x="400" y="60" text-anchor="middle">工具调用</text>
+    <line class="ln" x1="459" y1="84" x2="342" y2="84" marker-end="url(#ah)"/><text class="s" x="400" y="104" text-anchor="middle">原始输出</text>
+    <line class="ln" x1="235" y1="84" x2="118" y2="84" marker-end="url(#ah)"/><text class="s" x="176" y="104" text-anchor="middle">汇报（自然语言）</text>
+    <text class="tb" x="176" y="128" text-anchor="middle">总管看到的是这个，不是原始输出</text>
+  </svg></div>
+  <figcaption><b>交接处。</b>总管对世界的认识，完全经由子 agent 的自然语言汇报转达。本文谈的就是这个面。</figcaption>
+</figure>
+
+<h2 id="s2"><span class="num">2 / 威胁模型</span>一个谎报的子 agent</h2>
+<p>假设恰好有一个子 agent 失守，就是那个<em>产生</em>任务所依赖的值的 agent。它保留自己的工具权限；它碰不到其它 agent、环境，也改不了原始工具输出。它唯一的能力，是在汇报里选择说什么。特别地，它可以报一个与其工具返回不同的关键值。</p>
+<p>这是一个老问题换了身新衣服。总管用自己的权限按一个错误的值行动，这叫<em>confused deputy（糊涂的代理人）</em>；替换这个值的动作，叫<em>false data injection（虚假数据注入）</em>。新的地方在于场景：会改动真实环境的工具型 agent，而有害的那一步正是用户<em>自己</em>要做的动作，只是带了一个错误的参数。</p>
+<p>为什么假设子 agent 已经失守，而不是现场把它注入？因为在当前模型上，现场把注入打进这种形态基本不成功（见<a href="#s6">第 6 节</a>）。"子 agent 已失守"在这一文献里是标准假设，而且有几条现实途径可达：读了被投毒网页而被注入的子 agent、恶意插件或恶意子 agent 定义、或是一个你无法控制其输出的真正第三方 agent。</p>
+
+<h2 id="s3"><span class="num">3 / 为什么它藏得深</span>注入成功率 2%，干净谎报 97%</h2>
+<p>这个威胁之所以值得单独处理，是因为常见的防御都在看别处。在 MultiAgentDojo 上，用 <code>deepseek-v4.1-flash</code> 和标准的 <code>important_instructions</code> 攻击，攻击在 912 次运行里成功 <strong>2.0%</strong>。在一个对注入这么鲁棒的模型上，注入防御几乎没有东西可拦。</p>
+<p>谎报则不同。我们取出 20 个任务——其中一个子 agent 读到的值，会被另一个子 agent 原样用作某个会改动环境的调用的参数——让产生该值的 agent 失守，令它报一个替换值。当它干净地报出替换值时，攻击就得逞：</p>
+
+<div class="tw"><table>
+  <caption>C1 —— 有攻击、无防护。MultiAgentDojo，20 个任务，deepseek-v4.1-flash。</caption>
+  <thead><tr><th>失守 agent 的汇报</th><th class="n">运行数</th><th class="n">攻击成功</th></tr></thead>
+  <tbody>
+    <tr><td>干净谎报（只报替换值）</td><td class="n">39</td><td class="n lose">38</td></tr>
+    <tr><td>混报（真值与假值都提到）</td><td class="n">14</td><td class="n">2</td></tr>
+  </tbody>
+</table></div>
+
+<p>干净谎报在 <strong>39 次里成功 38 次</strong>。总管的下一步正是用户要求的；它只是拿错了数字，而且没有第二个来源去核对。更强的总管在这里帮不上忙，因为缺的是<em>信息</em>，不是判断力。你没法靠推理推出一个从没给你看过的值。</p>
+
+<h2 id="s4"><span class="num">4 / 防护</span>来源契约</h2>
+<p>把问题说准，解法就出来了。Prompt injection 之所以危险，是因为指令和数据走同一个通道，模型分不清它们。这里是对偶的问题：一个关键值必须<em>经模型重新生成</em>才能传下去，而接收方分不清照抄的值和生成的值。两者的解法一样——把模型从它不该在的通路里拿出去。模型可以决定<em>用哪个</em>值；值本身由系统从来源原样传递。</p>
+<p>一份<em>来源契约</em>是一小段数据，按任务写，点名少数几个要紧的参数，并把每个绑定到必须产生它的那次工具调用：</p>
+<pre><span class="c"># 一个付账单任务的契约</span>
+banking/user_task_0:
+  <span class="k">send_money</span>:
+    recipient: {must_come_from: {tool: read_file, args: {file_path: "bill-december-2023.txt"}}}
+    amount:    {must_come_from: {tool: read_file, args: {file_path: "bill-december-2023.txt"}}}</pre>
+<p>一个运行时守卫，在所有子 agent 共享的同一个进程里，记录每一次工具调用及其原始输出。任何会改动状态的调用执行前，对每个被契约点名的参数，它检查该值是否（在归一化大小写、URL 协议、尾部斜杠之后）出现在所要求工具、所要求参数那次调用的原始输出里。对不上，就拒绝执行，调用方收到一条固定消息。这是 <a href="https://arxiv.org/abs/2503.18813">CaMeL</a> 的"按引用传值"思想，收窄到契约点名的少数参数（而不是隔离所有工具数据），并应用到<em>跨</em>子 agent 的交接上。</p>
+
+<figure>
+  <div class="fig">
+  <svg viewBox="0 0 580 230" role="img" aria-label="付账单任务的三种设计：无防护让假账号通过；来源契约记录工具输出并拒绝无法追溯的值；让总管自己读则绕开了失守的 agent。">
+    <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--bad)"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--good)"/></marker></defs>
+    <text class="s" x="96" y="16" text-anchor="middle" font-weight="600" fill="var(--bad)">无防护</text>
+    <text class="s" x="290" y="16" text-anchor="middle" font-weight="600" fill="var(--cool)">来源契约</text>
+    <text class="s" x="484" y="16" text-anchor="middle" font-weight="600" fill="var(--good)">总管自己读</text>
+    <!-- panel 1 -->
+    <rect class="bx c" x="36" y="34" width="120" height="30" rx="5"/><text class="s" x="96" y="53" text-anchor="middle" fill="var(--bad)">文件 agent（撒谎）</text>
+    <rect class="bx" x="36" y="150" width="120" height="30" rx="5"/><text class="s" x="96" y="169" text-anchor="middle">send_money</text>
+    <line class="lb" x1="96" y1="64" x2="96" y2="148" marker-end="url(#ab)"/><text class="tb" x="101" y="112">GB82…（假）</text>
+    <text class="tb" x="96" y="200" text-anchor="middle">钱付给攻击者</text>
+    <!-- panel 2 -->
+    <rect class="bx c" x="230" y="34" width="120" height="30" rx="5"/><text class="s" x="290" y="53" text-anchor="middle" fill="var(--bad)">文件 agent（撒谎）</text>
+    <rect class="bx sys" x="230" y="92" width="120" height="26" rx="5"/><text class="s" x="290" y="109" text-anchor="middle" fill="var(--cool)">守卫 · 工具日志</text>
+    <rect class="bx off" x="230" y="150" width="120" height="30" rx="5"/><text class="s" x="290" y="169" text-anchor="middle" fill="var(--faint)">send_money</text>
+    <line class="lb" x1="290" y1="64" x2="290" y2="90" marker-end="url(#ab)"/>
+    <line class="lc" x1="290" y1="118" x2="290" y2="148" marker-end="url(#ah2)" stroke="var(--cool)"/>
+    <text class="tc" x="297" y="138">拒绝</text>
+    <text class="tc" x="290" y="200" text-anchor="middle">不在工具日志里</text>
+    <!-- panel 3 -->
+    <rect class="bx off" x="424" y="34" width="120" height="30" rx="5"/><text class="s" x="484" y="53" text-anchor="middle" fill="var(--faint)">文件 agent（未调用）</text>
+    <rect class="bx" x="424" y="150" width="120" height="30" rx="5"/><text class="s" x="484" y="169" text-anchor="middle">send_money</text>
+    <line class="lg" x1="484" y1="64" x2="484" y2="148" marker-end="url(#ag)"/><text class="tg" x="489" y="112">UK12…（真）</text>
+    <text class="tg" x="484" y="200" text-anchor="middle">正确付款</text>
+  </svg></div>
+  <figcaption><b>同一个任务，三种设计。</b>无防护时伪造的账号到达 <code>send_money</code>。契约记下文件的真实输出，拒绝不在日志里的账号。让总管自己带读取工具，则彻底绕开失守的 agent——这是契约必须打败的强基线（见<a href="#s5">第 5 节</a>）。</figcaption>
+</figure>
+
+<h2 id="s5"><span class="num">5 / 结果</span>契约拦住了什么，以及一个更简单的设计也拦住了什么</h2>
+<p>三个结果，按对这个方法有多有利排序。</p>
+
+<h3>契约拦住了谎报</h3>
+<p>在失守 agent 谎报的那 50 次运行里，守卫漏掉<strong>一次</strong>；一旦匹配做了归一化、并信任用户自己的请求，对正常任务的代价是 60 次里的 2 次。</p>
+<div class="tw"><table>
+  <caption>谎报威胁与来源契约，按套件。</caption>
+  <thead><tr><th>套件</th><th class="n">无防护·无攻击（完成率）</th><th class="n">加契约·无攻击（完成率）</th><th class="n">加契约·有攻击（攻击成功）</th></tr></thead>
+  <tbody>
+    <tr><td>banking</td><td class="n">6/6</td><td class="n">6/6</td><td class="n win">0/6</td></tr>
+    <tr><td>slack</td><td class="n">30/30</td><td class="n">30/30</td><td class="n win">0/25</td></tr>
+    <tr><td>travel</td><td class="n">12/12</td><td class="n">12/12</td><td class="n win">0/11</td></tr>
+    <tr><td>workspace</td><td class="n">12/12</td><td class="n">10/12</td><td class="n lose">1/8</td></tr>
+    <tr><td><strong>合计</strong></td><td class="n">60/60</td><td class="n"><strong>58/60</strong></td><td class="n"><strong>1/50</strong></td></tr>
+  </tbody>
+</table></div>
+<p>漏掉的那一次很有启发：那条规则只绑定了产生工具（<code>search_emails</code>），而失守的邮件 agent 同时拥有 <code>send_email</code>。最可能的路径是"先写后读"——agent 把假值写进邮箱再读出来，于是它有了出处。当失守 agent 能往被核对的来源里写东西时，只绑定工具的规则就不成立。</p>
+
+<h3>但让总管自己有读取权限，也能挡住大部分</h3>
+<p>如果你改为给总管自己一份套件工具的只读副本、完全不加契约，攻击大多就蒸发了。总管自己读来源，很多时候根本不委派读取，失守 agent 也就没机会开口：</p>
+<div class="tw"><table>
+  <thead><tr><th>条件</th><th class="n">总管自己读了来源</th><th class="n">攻击成功</th><th class="n">完成率</th></tr></thead>
+  <tbody>
+    <tr><td>O1 —— 总管有读取工具</td><td class="n">60/60</td><td class="n win">5/60</td><td class="n">57/60</td></tr>
+    <tr><td>O2 —— 并要求它核实汇报</td><td class="n">60/60</td><td class="n win">3/60</td><td class="n">53/60</td></tr>
+    <tr><td>C1 —— 总管没有工具</td><td class="n">—</td><td class="n lose">40/60</td><td class="n">28/60</td></tr>
+  </tbody>
+</table></div>
+<p>这是诚实的那部分。在<em>这个</em>基准上，契约相对"让总管自己读"这个简单设计的优势很窄：契约不依赖总管手里有什么工具，而且它保留了把读取委派出去。这是否重要，取决于系统<em>为什么</em>要委派读取——是总管拿不到的权限，还是大到收不回来的上下文。O1 里剩下的 5 次成功，恰好是来源（一个网页）只能经由失守 agent 才能访问的任务，这正是契约仍占优的地方。</p>
+
+<h3>直接 prompt 注入：契约能防，但前提是它不信任请求</h3>
+<p>直接 prompt 注入把攻击者的值接在用户请求后面。一个信任"用户请求里的值"的契约会按构造放行它，那个版本等于没防护。但这些任务里的关键值全是工具产生的，用户从不亲自输入。所以一个<em>严格</em>契约——把每个点名的值绑定到其产生工具、拒绝把请求当来源——就会拒掉注入的值，而合法的、来自工具的值照样通过：</p>
+<div class="tw"><table>
+  <caption>直接 prompt 注入，20 个任务。严格模式只把值绑定到工具。</caption>
+  <thead><tr><th>条件</th><th class="n">攻击成功</th></tr></thead>
+  <tbody>
+    <tr><td>D1 —— 直接注入，无防护</td><td class="n lose">46/60</td></tr>
+    <tr><td>D2 —— 加信任请求的契约</td><td class="n lose">48/60</td></tr>
+    <tr><td>D7 —— 加严格契约（绑定到工具）</td><td class="n win">2/59</td></tr>
+  </tbody>
+</table></div>
+<p>朴素契约在这里没用（48/60）；严格契约把直接注入压到接近零。代价是对 agent 自己拼出来的合法网址变体（在绑定网址后加了路径）的过度拒绝，严格匹配会拒掉它——这是一个已知的毛边，不是一堵墙。</p>
+
+<h2 id="s6"><span class="num">6 / 检测 ≠ 安全</span>警觉的模型照样点了那个链接</h2>
+<p>一个现场的间接注入——把文字种进 agent 会读到的网页里——能不能在不假设 agent 已失守的情况下造出谎报？在这个模型上，大多不能。固定的注入模板 60 次成功 0 次；子 agent 读到种下的指令并识破它（<q>这是一次 prompt injection，我不会照做</q>）。七种措辞扫 420 次，也只把它抬到 1 次。模型几乎总能看见注入。</p>
+<p>但<em>看见不等于拒绝执行</em>。在那唯一一次成功里，以及对抓网页任务的一次聚焦扫描里，agent 在汇报里点名了注入，<em>却仍然对攻击者的网址发起了一次请求</em>——埋在它反复试打不开的网页变体的重试循环里。我们把这记为 <code>executed_despite_flag</code>：agent 识破了注入，而攻击者的值仍然进了一次已执行的调用。一个直接针对这个信号做优化的自适应攻击者，能把它显著抬高：</p>
+<div class="tw"><table>
+  <thead><tr><th>设置（抓网页任务）</th><th class="n">识破了注入</th><th class="n">识破却仍执行</th></tr></thead>
+  <tbody>
+    <tr><td>固定措辞，单次尝试</td><td class="n">55/56</td><td class="n">4/56</td></tr>
+    <tr><td>自适应，优化该信号</td><td class="n">—</td><td class="n lose">8/39 ≈ 21%</td></tr>
+  </tbody>
+</table></div>
+<p>重点不是这个比例，而是：模型的警觉——几乎每次都触发——并不能保证它安全：在压力下，它仍会约每五次有一次执行攻击者的调用。而这恰恰是运行时核对该上场的地方。攻击者的网址不在绑定来源里，所以来源契约拒绝它——在同一批聚焦任务上 <strong>0/56</strong>。警觉没拦住，核对拦住了。</p>
+<div class="callout">一条主线：只要一个关键值有真实来源，就保留模型对这个值的<em>判断</em>，但不要它对这个值的<em>著作权</em>。让系统从来源把值带过来，并在出口处核对它。判断会以看起来像"顺从"的方式出错；来源不会。</div>
+
+<h2 id="s7"><span class="num">7 / 局限</span>它是什么、不是什么</h2>
+<ul>
+  <li><strong>机制并不新。</strong>按引用传值是 CaMeL；按值核对来源是 <a href="https://arxiv.org/abs/2609.18128">ContrAgent</a>（单 agent）。这里的增量是把它用到<em>跨子 agent 的交接</em>上、并把每个值绑定到产生它的那次调用——以及一张"它何时胜过更简单的设计"的经验地图。</li>
+  <li><strong>它需要可见的工具日志。</strong>一个真正的第三方 agent 在别人的服务器上跑工具；我们看不到原始输出，核对也就没有可比的对象。这个防护适用于在你自己进程里运行、但输出不可信的子 agent。</li>
+  <li><strong>它覆盖照抄的值，不覆盖计算出来的值。</strong>日期、金额、以及任何 agent 推导而非照抄的东西都在范围之外——约占会改动状态的参数的三分之一。</li>
+  <li><strong>两个假设仍未检验。</strong>契约是照标准答案的调用序列写的、不是学出来的；而且攻击者不知道防护存在。"先写后读"的攻击者、或种一个在绑定来源里本就存在的坏值的攻击者，是显而易见的下一个对手。</li>
+</ul>
+
+<h2 id="s8"><span class="num">8 / 要点</span></h2>
+<ul>
+  <li>谎报的子 agent 是一个真实且独立的威胁：在一个注入只成功 2% 的模型上，干净谎报成功 38/39，而且模型变强也没用。</li>
+  <li>一个把关键参数绑定到其产生工具的来源契约，拦住了它（1/50）、在严格模式下防住直接注入（46/60 → 2/59），并挡住了模型警觉挡不住的那些"识破却仍执行"的注入。</li>
+  <li>但在一个这么小的基准上，光是给总管读取权限就能在不加任何契约的情况下挡住大部分威胁。契约真正的价值很窄、很具体：当一个值的唯一来源，握在一个你无法信任的 agent 手里。</li>
+  <li>检测不等于安全。一个点名了攻击的模型，在自适应攻击者面前，仍约每五次有一次执行它。运行时的来源核对，才是那个不依赖模型选对的层。</li>
+</ul>
+
+<hr>
+<div class="refs">
+<h3 style="font-family:var(--sans)">参考文献与代码</h3>
+<ol>
+  <li>实验、运行器与契约：<a href="https://github.com/zyni2001">github.com/zyni2001</a>（仓库可按需提供）。</li>
+  <li>MultiAgentDojo —— AgentDojo 的多 agent 扩展。<a href="https://arxiv.org/abs/2610.05640">arXiv:2610.05640</a>。</li>
+  <li>CaMeL：Defeating Prompt Injections by Design。<a href="https://arxiv.org/abs/2503.18813">arXiv:2503.18813</a>。</li>
+  <li>ContrAgent —— 单 agent 的运行时来源核对。<a href="https://arxiv.org/abs/2609.18128">arXiv:2609.18128</a>。</li>
+  <li>The Attacker Moves Second —— 自适应攻击绕过注入防御。<a href="https://arxiv.org/abs/2510.09023">arXiv:2510.09023</a>。</li>
+</ol>
+<p class="small">数字来自 OpenRouter 上 <code>deepseek-v4.1-flash</code> 的运行；除注明外 20 个任务、每个重复 3 次。直接注入的严格契约那行（D7）在最后一次运行收尾时为 2/59。这是一项探索性研究；请把这些数字当作地图，而非排行榜。</p>
+</div>
+
+<footer>
+  作者：倪志宇 Zhiyu Ni，UC Berkeley EECS · <a href="https://github.com/zyni2001">GitHub</a> · <a href="https://zyni2001.github.io/">zyni2001.github.io</a><br>
+  <span class="small">草稿，2026 年 11 月。欢迎指正。</span>
+</footer>
+</main>
+
+<nav class="toc-rail" aria-label="目录">
+  <div class="tl">目录</div>
+  <ol>
+    <li><a href="#s1">1 · 总管只相信转述</a></li>
+    <li><a href="#s2">2 · 威胁模型</a></li>
+    <li><a href="#s3">3 · 为什么藏得深</a></li>
+    <li><a href="#s4">4 · 防护</a></li>
+    <li><a href="#s5">5 · 结果</a></li>
+    <li><a href="#s6">6 · 检测 ≠ 安全</a></li>
+    <li><a href="#s7">7 · 局限</a></li>
+    <li><a href="#s8">8 · 要点</a></li>
+  </ol>
+</nav>
+</div>
+</body>
+</html>

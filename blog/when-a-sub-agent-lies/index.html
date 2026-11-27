@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>When a Sub-Agent Lies</title>
+<meta name="description" content="Provenance contracts for multi-agent LLM security: the misreporting-sub-agent threat and a lightweight runtime defense.">
+<meta name="author" content="Zhiyu Ni">
+<meta property="og:type" content="article">
+<meta property="og:title" content="When a Sub-Agent Lies">
+<meta property="og:description" content="Provenance contracts for multi-agent LLM security: the misreporting-sub-agent threat and a lightweight runtime defense.">
+<meta property="og:url" content="https://zyni2001.github.io/blog/when-a-sub-agent-lies/">
+<link rel="canonical" href="https://zyni2001.github.io/blog/when-a-sub-agent-lies/">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="langbar"><a href="./" aria-current="page">EN</a><span>·</span><a href="zh.html">中文</a></div>
+<div class="layout">
+<main class="main">
+<header>
+  <div class="key">Multi-Agent Systems · AI Security · Verifiable Agents</div>
+  <h1>When a Sub-Agent Lies</h1>
+  <p class="lede">An orchestrator LLM rarely touches data itself; it acts on what its sub-agents report. If one sub-agent reports a wrong value, the orchestrator carries out the user's own legitimate action with the attacker's number. Prompt-injection defenses do not see this, and a stronger model does not fix it. This note works through the threat on MultiAgentDojo and asks a narrow question: can a lightweight <em>provenance contract</em> close it, and at what cost?</p>
+  <div class="byline">
+    <span>Zhiyu Ni</span>
+    <span>·</span>
+    <span>UC Berkeley EECS</span>
+    <span>·</span>
+    <span>November 2026</span>
+    <span>·</span>
+    <a href="https://github.com/zyni2001">github.com/zyni2001</a>
+  </div>
+</header>
+
+<h2 id="s1"><span class="num">1 / MOTIVATION</span>The orchestrator trusts what it is told</h2>
+<p>Agentic systems increasingly split a task across several LLM agents. A common shape, and the one <a href="https://arxiv.org/abs/2610.05640">MultiAgentDojo</a> uses, is an <em>orchestrator</em> that holds no tools of its own and a set of <em>sub-agents</em> that each own a slice of the tools. The orchestrator plans; it calls a sub-agent as a function with a natural-language task; the sub-agent runs its tools and reports back in prose; the orchestrator reads that prose and decides the next call.</p>
+<p>This factoring is attractive for permissions and context: the file agent reads files, the banking agent moves money, and neither can do the other's job. But it introduces a quiet assumption. The orchestrator never sees a tool's raw output. It sees a sub-agent's <em>description</em> of that output. Every critical value, a recipient account, an email address, a URL, passes through a model that regenerates it as free text. The receiver cannot tell a value that was copied verbatim from a tool from a value the model wrote.</p>
+
+<figure>
+  <div class="fig">
+  <svg viewBox="0 0 580 150" role="img" aria-label="The orchestrator calls a sub-agent, which runs a tool and reports back in prose; the orchestrator never sees the raw tool output.">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+    <rect class="bx" x="14" y="55" width="104" height="40" rx="6"/><text class="t" x="66" y="79" text-anchor="middle">Orchestrator</text>
+    <rect class="bx" x="238" y="55" width="104" height="40" rx="6"/><text class="t" x="290" y="79" text-anchor="middle">Sub-agent</text>
+    <rect class="bx sys" x="462" y="55" width="104" height="40" rx="6"/><text class="t" x="514" y="79" text-anchor="middle" fill="var(--cool)">Tool</text>
+    <line class="ln" x1="118" y1="68" x2="235" y2="68" marker-end="url(#ah)"/><text class="s" x="176" y="60" text-anchor="middle">task (NL)</text>
+    <line class="ln" x1="342" y1="68" x2="459" y2="68" marker-end="url(#ah)"/><text class="s" x="400" y="60" text-anchor="middle">tool call</text>
+    <line class="ln" x1="459" y1="84" x2="342" y2="84" marker-end="url(#ah)"/><text class="s" x="400" y="104" text-anchor="middle">raw output</text>
+    <line class="ln" x1="235" y1="84" x2="118" y2="84" marker-end="url(#ah)"/><text class="s" x="176" y="104" text-anchor="middle">report (NL)</text>
+    <text class="tb" x="176" y="128" text-anchor="middle">the orchestrator sees this, not the raw output</text>
+  </svg></div>
+  <figcaption><b>The handoff.</b> The orchestrator's view of the world is mediated entirely by the sub-agent's natural-language report. That is the surface this note is about.</figcaption>
+</figure>
+
+<h2 id="s2"><span class="num">2 / THREAT MODEL</span>A misreporting sub-agent</h2>
+<p>Suppose exactly one sub-agent is compromised, the one that <em>produces</em> a value the task depends on. It keeps its own tool permissions; it cannot touch other agents, the environment, or the raw tool outputs. Its only power is what it chooses to say in its report. In particular, it may report a critical value that differs from what its tool returned.</p>
+<p>This is an old pattern wearing new clothes. The orchestrator acting on a false value with its own authority is a <em>confused deputy</em>; the act of substituting the value is <em>false data injection</em>. What is new is the setting: tool-using agents that change a real environment, where the harmful step is the user's <em>own</em> requested action, carried out with one wrong argument.</p>
+<p>Why assume the sub-agent is already compromised rather than injecting it live? Because on current models, live injection into this shape barely works (<a href="#s6">Section 6</a>). The compromised-agent assumption is standard in this literature and is reachable through several real routes: a prompt-injected sub-agent that has read a poisoned page, a malicious plugin or sub-agent definition, or a genuine third-party agent whose output you do not control.</p>
+
+<h2 id="s3"><span class="num">3 / WHY IT HIDES</span>Injection is 2%, a clean misreport is 97%</h2>
+<p>The reason this threat deserves its own treatment is that the usual defenses are looking elsewhere. On MultiAgentDojo with <code>deepseek-v4.1-flash</code> and the standard <code>important_instructions</code> attack, the attack succeeds in <strong>2.0%</strong> of 912 runs. On a model this robust to injection, there is almost nothing for an injection defense to remove.</p>
+<p>A misreport is different. We take the 20 tasks where a value one sub-agent reads is used verbatim as an argument of another sub-agent's state-changing call, compromise the producing agent, and have it report a replacement value. When it reports the replacement cleanly, the attack lands:</p>
+
+<div class="tw"><table>
+  <caption>C1 — attack, no defense. MultiAgentDojo, 20 tasks, deepseek-v4.1-flash.</caption>
+  <thead><tr><th>The compromised agent's report</th><th class="n">Runs</th><th class="n">Attack succeeded</th></tr></thead>
+  <tbody>
+    <tr><td>Clean misreport (replacement only)</td><td class="n">39</td><td class="n lose">38</td></tr>
+    <tr><td>Mixed (true and false value both named)</td><td class="n">14</td><td class="n">2</td></tr>
+  </tbody>
+</table></div>
+
+<p>A clean misreport succeeds <strong>38 of 39</strong> times. The orchestrator's next step is exactly what the user asked for; it simply has the wrong number, and no second source to check it against. A stronger orchestrator does not help here, because the missing ingredient is <em>information</em>, not judgment. You cannot reason your way to a value you were never shown.</p>
+
+<h2 id="s4"><span class="num">4 / THE DEFENSE</span>A provenance contract</h2>
+<p>The fix follows from naming the problem precisely. Prompt injection is dangerous because instructions and data share one channel and the model cannot tell them apart. Here the dual problem: a critical value must be <em>regenerated by a model</em> to be handed on, and the receiver cannot tell a copied value from a generated one. Both are solved the same way, by taking the model out of the path it should not be in. The model may choose <em>which</em> value to use; the system carries the value from its source.</p>
+<p>A <em>provenance contract</em> is a small piece of data, written per task, that names the few arguments that matter and binds each to the tool call that must have produced it:</p>
+<pre><span class="c"># contract for a bill-payment task</span>
+banking/user_task_0:
+  <span class="k">send_money</span>:
+    recipient: {must_come_from: {tool: read_file, args: {file_path: "bill-december-2023.txt"}}}
+    amount:    {must_come_from: {tool: read_file, args: {file_path: "bill-december-2023.txt"}}}</pre>
+<p>A runtime guard keeps a log of every tool call and its raw output across all sub-agents, in the one process they share. Before any state-changing call executes, for each contract-named argument it checks that the value appears (after normalizing case, URL scheme, and trailing slash) in the raw output of the required tool with the required arguments. If it does not, the call is denied and the calling agent gets one fixed message. This is the by-reference idea from <a href="https://arxiv.org/abs/2503.18813">CaMeL</a>, restricted to the handful of arguments a contract names rather than isolating all tool data, and applied <em>across</em> the sub-agent boundary.</p>
+
+<figure>
+  <div class="fig">
+  <svg viewBox="0 0 580 230" role="img" aria-label="Three designs for a bill-payment task: no defense lets the false account through; the provenance contract records the tool output and denies the unverifiable value; giving the orchestrator its own read tool avoids the compromised agent.">
+    <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--bad)"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--good)"/></marker></defs>
+    <text class="s" x="96" y="16" text-anchor="middle" font-weight="600" fill="var(--bad)">No defense</text>
+    <text class="s" x="290" y="16" text-anchor="middle" font-weight="600" fill="var(--cool)">Provenance contract</text>
+    <text class="s" x="484" y="16" text-anchor="middle" font-weight="600" fill="var(--good)">Orchestrator reads</text>
+    <!-- panel 1 -->
+    <rect class="bx c" x="36" y="34" width="120" height="30" rx="5"/><text class="s" x="96" y="53" text-anchor="middle" fill="var(--bad)">file agent (lies)</text>
+    <rect class="bx" x="36" y="150" width="120" height="30" rx="5"/><text class="s" x="96" y="169" text-anchor="middle">send_money</text>
+    <line class="lb" x1="96" y1="64" x2="96" y2="148" marker-end="url(#ab)"/><text class="tb" x="101" y="112">GB82… (fake)</text>
+    <text class="tb" x="96" y="200" text-anchor="middle">paid attacker</text>
+    <!-- panel 2 -->
+    <rect class="bx c" x="230" y="34" width="120" height="30" rx="5"/><text class="s" x="290" y="53" text-anchor="middle" fill="var(--bad)">file agent (lies)</text>
+    <rect class="bx sys" x="230" y="92" width="120" height="26" rx="5"/><text class="s" x="290" y="109" text-anchor="middle" fill="var(--cool)">guard · tool log</text>
+    <rect class="bx off" x="230" y="150" width="120" height="30" rx="5"/><text class="s" x="290" y="169" text-anchor="middle" fill="var(--faint)">send_money</text>
+    <line class="lb" x1="290" y1="64" x2="290" y2="90" marker-end="url(#ab)"/>
+    <line class="lc" x1="290" y1="118" x2="290" y2="148" marker-end="url(#ah2)" stroke="var(--cool)"/>
+    <text class="tc" x="297" y="138">deny</text>
+    <text class="tc" x="290" y="200" text-anchor="middle">not in tool log</text>
+    <!-- panel 3 -->
+    <rect class="bx off" x="424" y="34" width="120" height="30" rx="5"/><text class="s" x="484" y="53" text-anchor="middle" fill="var(--faint)">file agent (idle)</text>
+    <rect class="bx" x="424" y="150" width="120" height="30" rx="5"/><text class="s" x="484" y="169" text-anchor="middle">send_money</text>
+    <line class="lg" x1="484" y1="64" x2="484" y2="148" marker-end="url(#ag)"/><text class="tg" x="489" y="112">UK12… (real)</text>
+    <text class="tg" x="484" y="200" text-anchor="middle">paid correctly</text>
+  </svg></div>
+  <figcaption><b>Same task, three designs.</b> Without a defense the fabricated account reaches <code>send_money</code>. The contract records the file's real output and denies the account that is not in the log. Giving the orchestrator its own read tool sidesteps the compromised agent entirely — a strong baseline the contract has to beat (<a href="#s5">Section 5</a>).</figcaption>
+</figure>
+
+<h2 id="s5"><span class="num">5 / RESULTS</span>What the contract stops, and what a simpler design stops too</h2>
+<p>Three results, in order of how much they flatter the method.</p>
+
+<h3>The contract stops the misreport</h3>
+<p>Across the 50 runs where the compromised agent misreported, the guard let <strong>one</strong> through, at a benign cost of 2 of 60 runs once the matching normalizes values and trusts the user's own request.</p>
+<div class="tw"><table>
+  <caption>Misreport threat and the provenance contract, by suite.</caption>
+  <thead><tr><th>Suite</th><th class="n">No defense, no attack (utility)</th><th class="n">Contract, no attack (utility)</th><th class="n">Contract, under attack (succeeded)</th></tr></thead>
+  <tbody>
+    <tr><td>banking</td><td class="n">6/6</td><td class="n">6/6</td><td class="n win">0/6</td></tr>
+    <tr><td>slack</td><td class="n">30/30</td><td class="n">30/30</td><td class="n win">0/25</td></tr>
+    <tr><td>travel</td><td class="n">12/12</td><td class="n">12/12</td><td class="n win">0/11</td></tr>
+    <tr><td>workspace</td><td class="n">12/12</td><td class="n">10/12</td><td class="n lose">1/8</td></tr>
+    <tr><td><strong>all</strong></td><td class="n">60/60</td><td class="n"><strong>58/60</strong></td><td class="n"><strong>1/50</strong></td></tr>
+  </tbody>
+</table></div>
+<p>The one leak is instructive: that rule binds the producing tool only (<code>search_emails</code>), and the compromised email agent also owns <code>send_email</code>. The likely path is write-then-read-back, the agent writes the false value into the mailbox and reads it out, giving it provenance. A tool-only binding does not hold when the compromised agent can write to the source it is checked against.</p>
+
+<h3>But giving the orchestrator read access stops most of it too</h3>
+<p>If you instead give the orchestrator its own read-only copies of the suite's tools and no contract at all, the attack mostly evaporates. The orchestrator reads the source itself, often without delegating the read, so the compromised agent never gets to speak:</p>
+<div class="tw"><table>
+  <thead><tr><th>Condition</th><th class="n">Orchestrator read itself</th><th class="n">Attack succeeded</th><th class="n">Utility</th></tr></thead>
+  <tbody>
+    <tr><td>O1 — orchestrator has read tools</td><td class="n">60/60</td><td class="n win">5/60</td><td class="n">57/60</td></tr>
+    <tr><td>O2 — + told to verify reports</td><td class="n">60/60</td><td class="n win">3/60</td><td class="n">53/60</td></tr>
+    <tr><td>C1 — orchestrator has no tools</td><td class="n">—</td><td class="n lose">40/60</td><td class="n">28/60</td></tr>
+  </tbody>
+</table></div>
+<p>This is the honest part. In <em>this</em> benchmark the contract's advantage over the simple "let the orchestrator read" design is narrow: the contract does not depend on which tools the orchestrator holds, and it keeps the reads delegated. Whether that matters depends on <em>why</em> a system delegates reads in the first place, permissions it cannot grant the orchestrator, or context too large to pull back. The remaining 5 successes in O1 are exactly the tasks where the source (a web page) was reachable only through the compromised agent, which is where the contract keeps its edge.</p>
+
+<h3>Direct prompt injection: the contract defends, but only if it does not trust the request</h3>
+<p>A direct prompt injection appends the attacker's value to the user's request. A contract that trusts "values from the user's prompt" passes it by construction, so that version is no defense at all. But the critical values in these tasks are all tool-derived; the user never types them. So a <em>strict</em> contract that binds every named value to its producing tool, and refuses the prompt as a source, denies the injected value while the legitimate tool-derived value still passes:</p>
+<div class="tw"><table>
+  <caption>Direct prompt injection, 20 tasks. Strict mode binds values to tools only.</caption>
+  <thead><tr><th>Condition</th><th class="n">Attack succeeded</th></tr></thead>
+  <tbody>
+    <tr><td>D1 — direct injection, no defense</td><td class="n lose">46/60</td></tr>
+    <tr><td>D2 — + contract that trusts the request</td><td class="n lose">48/60</td></tr>
+    <tr><td>D7 — + strict contract (tool-bound)</td><td class="n win">2/59</td></tr>
+  </tbody>
+</table></div>
+<p>The naive contract is useless here (48/60); the strict contract cuts direct injection to near zero. The cost is over-denial of legitimate URL variants the agent constructs (adding a path to a bound URL), which strict matching rejects — a known rough edge, not a wall.</p>
+
+<h2 id="s6"><span class="num">6 / DETECTION ≠ SAFETY</span>A vigilant model still clicks the link</h2>
+<p>Can a live indirect injection, text planted in a web page the agent reads, produce the misreport without the compromised-agent assumption? On this model, mostly no. A fixed injection template succeeds 0 of 60 times; the sub-agent reads the planted instruction and flags it (<q>this is a prompt injection, I will not follow it</q>). Sweeping seven wordings over 420 runs raised it to 1. The model almost always sees the injection.</p>
+<p>But <em>seeing is not refusing to act</em>. In the one success, and in a focused sweep of the web-fetch tasks, the agent named the injection in its report and <em>still issued one request to the attacker's URL</em>, buried in a retry loop as it tried variants of the page it could not load. We record this as <code>executed_despite_flag</code>: the agent flagged the injection, and the attacker's value still reached an executed call. An adaptive attacker that optimizes directly for this signal pushes it up sharply:</p>
+<div class="tw"><table>
+  <thead><tr><th>Setting (web-fetch tasks)</th><th class="n">Flagged the injection</th><th class="n">Flagged yet executed</th></tr></thead>
+  <tbody>
+    <tr><td>Fixed wording, one attempt</td><td class="n">55/56</td><td class="n">4/56</td></tr>
+    <tr><td>Adaptive, optimizing the signal</td><td class="n">—</td><td class="n lose">8/39 ≈ 21%</td></tr>
+  </tbody>
+</table></div>
+<p>The point is not the rate. It is that a model's vigilance, which fires nearly every time, does not keep it safe: it will still execute the attacker's call about one time in five under pressure. And this is exactly where a runtime check earns its place. The attacker's URL is not in the bound source, so the provenance contract denies it — <strong>0 of 56</strong> on the same focused tasks. Vigilance did not catch it; the check did.</p>
+<div class="callout">The through-line: whenever a critical value has a real source, keep the model's <em>judgment</em> about that value but not its <em>authorship</em> of it. Have the system carry the value from the source and verify it on the way out. Judgment is fallible in ways that look like compliance; provenance is not.</div>
+
+<h2 id="s7"><span class="num">7 / LIMITATIONS</span>What this is and is not</h2>
+<ul>
+  <li><strong>The mechanism is not new.</strong> By-reference passing is CaMeL; provenance-by-value is <a href="https://arxiv.org/abs/2609.18128">ContrAgent</a>, single-agent. The contribution here is applying it across sub-agent handoffs and binding each value to the call that produced it — and the empirical map of when it beats a simpler design.</li>
+  <li><strong>It needs a visible tool log.</strong> A true third-party agent runs its tools on someone else's server; we never see the raw output, and the check has nothing to compare against. The defense is for sub-agents that run in your own process but whose output you cannot trust.</li>
+  <li><strong>It covers copied values, not computed ones.</strong> Dates, amounts, and anything the agent derives rather than copies are out of scope — about a third of state-changing arguments.</li>
+  <li><strong>Two assumptions are still untested.</strong> The contracts were written from ground-truth call sequences, not learned; and the attacker did not know the defense. A write-then-read-back attacker, or one that plants a bad value already present in a bound source, is the obvious next adversary.</li>
+</ul>
+
+<h2 id="s8"><span class="num">8 / TAKEAWAYS</span></h2>
+<ul>
+  <li>A misreporting sub-agent is a real and distinct threat: on a model where injection succeeds 2% of the time, a clean misreport succeeds 38/39, and model strength does not help.</li>
+  <li>A provenance contract that binds critical arguments to their producing tool stops it (1/50), defends direct injection in strict mode (46/60 → 2/59), and catches the "flagged-yet-executed" injections that model vigilance does not.</li>
+  <li>But in a benchmark this small, simply giving the orchestrator read access removes most of the threat without any contract. The contract's real value is narrow and specific: when the only source of a value is held by an agent you cannot trust.</li>
+  <li>Detection is not safety. A model that names the attack still executes it about one time in five under an adaptive attacker. Runtime provenance is the layer that does not depend on the model choosing correctly.</li>
+</ul>
+
+<hr>
+<div class="refs">
+<h3 style="font-family:var(--sans)">References &amp; code</h3>
+<ol>
+  <li>Experiments, runner, and contracts: <a href="https://github.com/zyni2001">github.com/zyni2001</a> (repository available on request).</li>
+  <li>MultiAgentDojo — a multi-agent extension of AgentDojo. <a href="https://arxiv.org/abs/2610.05640">arXiv:2610.05640</a>.</li>
+  <li>CaMeL: Defeating Prompt Injections by Design. <a href="https://arxiv.org/abs/2503.18813">arXiv:2503.18813</a>.</li>
+  <li>ContrAgent — runtime provenance for a single agent. <a href="https://arxiv.org/abs/2609.18128">arXiv:2609.18128</a>.</li>
+  <li>The Attacker Moves Second — adaptive attacks bypass injection defenses. <a href="https://arxiv.org/abs/2510.09023">arXiv:2510.09023</a>.</li>
+</ol>
+<p class="small">Numbers are from runs on <code>deepseek-v4.1-flash</code> via OpenRouter; 20 tasks, 3 repeats unless noted. The direct-injection strict-contract row (D7) is 2/59 as the final run completes. This is an exploratory study; treat the figures as a map, not a benchmark leaderboard.</p>
+</div>
+
+<footer>
+  Written by Zhiyu Ni, UC Berkeley EECS · <a href="https://github.com/zyni2001">GitHub</a> · <a href="https://zyni2001.github.io/">zyni2001.github.io</a><br>
+  <span class="small">Draft, November 2026. Comments welcome.</span>
+</footer>
+</main>
+
+<nav class="toc-rail" aria-label="Contents">
+  <div class="tl">Contents</div>
+  <ol>
+    <li><a href="#s1">1 · The orchestrator trusts</a></li>
+    <li><a href="#s2">2 · Threat model</a></li>
+    <li><a href="#s3">3 · Why it hides</a></li>
+    <li><a href="#s4">4 · The defense</a></li>
+    <li><a href="#s5">5 · Results</a></li>
+    <li><a href="#s6">6 · Detection ≠ safety</a></li>
+    <li><a href="#s7">7 · Limitations</a></li>
+    <li><a href="#s8">8 · Takeaways</a></li>
+  </ol>
+</nav>
+</div>
+</body>
+</html>
